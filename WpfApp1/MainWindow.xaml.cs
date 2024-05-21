@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,34 +24,15 @@ namespace WpfApp1
     /// </summary>
     public partial class MainWindow : Window
     {
+        private MainWindowViewModel _viewModel;
+
         public MainWindow()
         {
             InitializeComponent();
+            _viewModel = new MainWindowViewModel();
+            DataContext = _viewModel;
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-        private void Search(object sender, RoutedEventArgs e) { 
-        }
-
-        private void ChooseCitra(object sender, RoutedEventArgs e) { }
-        
-
-        private void ToggleButton_Algoritma_Checked(object sender, RoutedEventArgs e)
-        {
-
-        }
-        private void Button_Click_SelectImage(object sender, RoutedEventArgs e)
-        {
-            // Handle select image click
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            if (openFileDialog.ShowDialog() == true)
-            {
-                ImagePlaceholder.Source = new BitmapImage(new Uri(openFileDialog.FileName));
-            }
-        }
 
 
     }

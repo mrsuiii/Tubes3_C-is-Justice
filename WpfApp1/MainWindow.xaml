@@ -7,127 +7,71 @@
         mc:Ignorable="d"
         Title="FingerPrint Matcher" Height="450" Width="800">
     <Window.Resources>
-        <Style x:Key="ButtonFocusVisual">
-            <Setter Property="Control.Template">
-                <Setter.Value>
-                    <ControlTemplate>
-                        <Rectangle Margin="2" SnapsToDevicePixels="true" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" StrokeThickness="1" StrokeDashArray="1 2"/>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <LinearGradientBrush x:Key="ButtonNormalBackground" EndPoint="0,1" StartPoint="0,0">
-            <GradientStop Color="#F3F3F3" Offset="0"/>
-            <GradientStop Color="#EBEBEB" Offset="0.5"/>
-            <GradientStop Color="#DDDDDD" Offset="0.5"/>
-            <GradientStop Color="#CDCDCD" Offset="1"/>
-        </LinearGradientBrush>
-        <SolidColorBrush x:Key="ButtonNormalBorder" Color="#FF707070"/>
 
-        <Style x:Key="ToggleButtonStyle1" TargetType="{x:Type ToggleButton}">
-            <Setter Property="FocusVisualStyle" Value="{StaticResource ButtonFocusVisual}"/>
-            <Setter Property="Background" Value="{StaticResource ButtonNormalBackground}"/>
-            <Setter Property="BorderBrush" Value="{StaticResource ButtonNormalBorder}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
-            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Padding" Value="1"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type ToggleButton}">
-                        <StackPanel Orientation="Horizontal">
-                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
-                            <Border x:Name="on" Width="60" Height="25" Background="LightGray" CornerRadius="15,0,0,15" Margin="10,0,0,0">
-                                <TextBlock x:Name="onText" Text="BM"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                            <Border x:Name="off" Width="60" Height="25" Background="LightGray" CornerRadius="0,15,15,0">
-                                <TextBlock x:Name="offText" Text="KMP" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                        </StackPanel>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsEnabled" Value="false">
-                                <Setter Property="Foreground" Value="#ADADAD"/>
-                            </Trigger>
-                            <Trigger Property="IsChecked" Value="true">
-                                <Setter TargetName="on" Property="Background" Value="Blue"/>
-                                <Setter TargetName="onText" Property="Foreground" Value="White"/>
-                            </Trigger>
-                            <Trigger Property="IsChecked" Value="False">
-                                <Setter TargetName="off" Property="Background" Value="purple"/>
-                                <Setter TargetName="offText" Property="Foreground" Value="White"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
+
+
 
         <!-- Define a style for rounded buttons -->
-        <Style x:Key="RoundedButtonStyle" TargetType="Button">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}" 
-                                BorderBrush="{TemplateBinding BorderBrush}" 
-                                BorderThickness="1" 
-                                CornerRadius="15" 
-                                Padding="10,5">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="true">
-                                <Setter Property="Background" Value="LightBlue"/>
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="true">
-                                <Setter Property="Background" Value="LightGray"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Setter Property="Background" Value="#FFDDDDDD"/>
-            <Setter Property="BorderBrush" Value="#FF707070"/>
-            <Setter Property="Foreground" Value="Black"/>
-            <Setter Property="Padding" Value="10,5"/>
-            <Setter Property="HorizontalAlignment" Value="Center"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-        </Style>
-       
     </Window.Resources>
+    <Window.DataContext>
+        <local:MainWindowViewModel />
+    </Window.DataContext>
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="7*"/>
+            <ColumnDefinition Width="33*"/>
+        </Grid.ColumnDefinitions>
         <!-- Image placeholder -->
-        <Image x:Name="ImagePlaceholder" Style="{StaticResource ImagePlaceholderStyle}" Margin="328,41,272,88"/>
-        <Button Content="Sidik Jari Masukan" Click="Button_Click" Width="200" Margin="67,41,539,88"/>
-        <Button Content="Sidik Jari Cocok" Click="Button_Click" Width="200" Margin="310,41,290,88"/>
-        <Button Content="List Biodata" Click="Button_Click" Width="200" Margin="578,41,22,88"/>
+
+        <Grid HorizontalAlignment="Left" Background="LightGray" VerticalAlignment="Top" Margin="41,69,0,0" Height="277" Width="204" Grid.ColumnSpan="2" >
+            <Image x:Name="FingerPrintUploadImageHolder" Stretch="Fill" Source="{Binding FingerPrintImage}"/>
+
+            <TextBlock x:Name="FingerPrintInputText" Visibility="{Binding FingerPrintInputTextVisibility}" MinWidth="50" Height="15" Width="107" Margin="48,138,48,123"><Run Text="Sidik Jari Masukan"/></TextBlock>
+
+        </Grid>
+        <Grid HorizontalAlignment="Left" Background="LightGray" VerticalAlignment="Top" Margin="150,69,0,0" Height="281" Width="204" Grid.Column="1" >
+            <Image x:Name="FingerPrintMatchedHolder" Stretch="Fill" Margin="242,8,-242,-8"  />
+
+            <TextBlock x:Name="FingerPrintMatchedText"  MinWidth="50" Height="15" Margin="61,138,61,123"><Run Text="Sidik Jari Cocok"/></TextBlock>
+
+        </Grid>
+        <Grid HorizontalAlignment="Left" Background="LightGray" VerticalAlignment="Top" Margin="391,69,0,0" Height="281" Width="204" Grid.Column="1" >
+            <Image x:Name="BiodataHolder" Stretch="Fill" Margin="477,8,-477,-8"  />
+
+            <TextBlock x:Name="BiodataText" HorizontalAlignment="Center" MinWidth="50" Height="15" Width="64" Margin="0,134,0,128"><Run Text="List Biodata"/></TextBlock>
+
+        </Grid>
+
 
         <!-- Apply the RoundedButtonStyle to the buttons -->
         <Button 
-                Command="{Binding Search_Command}"
+                Command="{Binding SearchCommand}"
                 CommandParameter="{Binding ElementName=Button_Search,Path=Content}" 
                 x:Name="Button_Search"
                 Width="76"
                 Height="30"
-                Margin="390,367,334,37"
+                Margin="278,373,0,0"
                 Content="Search"
-                Style="{StaticResource RoundedButtonStyle}">
+                Style="{StaticResource RoundedButtonStyle}" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top">
         </Button>
-        <Button 
+        <Button
+                Command="{Binding UploadImageCommand}"
                 Content="Pilih Citra" 
-                Click="Button_Click_SelectImage" 
-                Margin="76,369,633,37" 
-                Style="{StaticResource RoundedButtonStyle}"/>
+                Margin="41,373,0,0" 
+                Style="{StaticResource RoundedButtonStyle}" VerticalAlignment="Top" Width="125" Grid.ColumnSpan="2" HorizontalAlignment="Left"
+               
+                    >
+        </Button>
 
-        <Grid VerticalAlignment="Center" HorizontalAlignment="Center">
+        <Grid VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Column="1" Margin="218,0,0,0">
             <ToggleButton 
                 x:Name="ToggleButton_Algoritma"
-                Command="{Binding Algoritma_Command}"
-                CommandParameter="{Binding ElementName=ToggleButton_Algoritma}"
+                Command="{Binding ToggleAlgoritmaCommand}"
+                CommandParameter="{Binding IsChecked, RelativeSource={RelativeSource Self}}"
                 Style="{StaticResource ToggleButtonStyle1}" 
-                Checked="ToggleButton_Algoritma_Checked" 
+                
                 RenderTransformOrigin="0.142,3.981" 
-                Margin="-156,162,107,-172"/>
+                Margin="-140,167,86,-182"/>
         </Grid>
     </Grid>
 </Window>

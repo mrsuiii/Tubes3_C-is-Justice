@@ -5,63 +5,67 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="FingerPrint Matcher" Height="450" Width="800">
+        Title="FingerPrint Matcher" Height="1080" Width="1920">
     <Window.Resources>
-
-
-
-
         <!-- Define a style for rounded buttons -->
     </Window.Resources>
     <Window.DataContext>
         <local:MainWindowViewModel />
     </Window.DataContext>
+
     <Grid>
+        
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="7*"/>
             <ColumnDefinition Width="33*"/>
         </Grid.ColumnDefinitions>
         <!-- Image placeholder -->
 
-        <Grid HorizontalAlignment="Left" Background="LightGray" VerticalAlignment="Top" Margin="41,69,0,0" Height="277" Width="204" Grid.ColumnSpan="2" >
-            <Image x:Name="FingerPrintUploadImageHolder" Stretch="Fill" Source="{Binding FingerPrintImage}"/>
+        <Grid HorizontalAlignment="Left" Background="LightGray" VerticalAlignment="Center" Margin="80,0,0,0" Height="691" Width="469" Grid.ColumnSpan="2" >
+            <Image x:Name="FingerPrintUploadImageHolder" Stretch="Fill" Source="{Binding FingerPrintImage}" RenderTransformOrigin="0.5,0.5" Margin="0,-4,0,5">
+               
+            </Image>
 
-            <TextBlock x:Name="FingerPrintInputText" Visibility="{Binding FingerPrintInputTextVisibility}" MinWidth="50" Height="15" Width="107" Margin="48,138,48,123"><Run Text="Sidik Jari Masukan"/></TextBlock>
-
-        </Grid>
-        <Grid HorizontalAlignment="Left" Background="LightGray" VerticalAlignment="Top" Margin="150,69,0,0" Height="281" Width="204" Grid.Column="1" >
-            <Image x:Name="FingerPrintMatchedHolder" Stretch="Fill" Margin="242,8,-242,-8"  />
-
-            <TextBlock x:Name="FingerPrintMatchedText"  MinWidth="50" Height="15" Margin="61,138,61,123"><Run Text="Sidik Jari Cocok"/></TextBlock>
+            <TextBlock x:Name="FingerPrintInputText" Visibility="{Binding FingerPrintInputTextVisibility}" MinWidth="50" Height="15" Width="107" Margin="181,346,181,331"><Run Text="Sidik Jari Masukan"/></TextBlock>
 
         </Grid>
-        <Grid HorizontalAlignment="Left" Background="LightGray" VerticalAlignment="Top" Margin="391,69,0,0" Height="281" Width="204" Grid.Column="1" >
+        <Grid HorizontalAlignment="Left" Background="LightGray" VerticalAlignment="Center" Margin="329,0,0,0" Height="691" Width="520" Grid.Column="1" >
+            <Image x:Name="FingerPrintMatchedHolder" Stretch="Fill" Margin="0,-5,0,5"  />
+
+            <TextBlock x:Name="FingerPrintMatchedText" HorizontalAlignment="Center"  MinWidth="50" Height="15" Margin="61,138,61,123"><Run Text="Sidik Jari Cocok"/></TextBlock>
+
+        </Grid>
+        <Grid HorizontalAlignment="Left" Background="LightGray" VerticalAlignment="Center" Margin="999,0,0,0" Height="691" Width="500" Grid.Column="1" >
             <Image x:Name="BiodataHolder" Stretch="Fill" Margin="477,8,-477,-8"  />
 
             <TextBlock x:Name="BiodataText" HorizontalAlignment="Center" MinWidth="50" Height="15" Width="64" Margin="0,134,0,128"><Run Text="List Biodata"/></TextBlock>
 
         </Grid>
-
+        <TextBlock Text="Fingerprint Mathcer"
+                   Foreground="Purple"
+                   FontSize="36"
+                   FontWeight="Bold" Grid.Column="1" Margin="419,50,819,950"  
+                  >
+        </TextBlock>
 
         <!-- Apply the RoundedButtonStyle to the buttons -->
         <Button 
                 Command="{Binding SearchCommand}"
                 CommandParameter="{Binding ElementName=Button_Search,Path=Content}" 
                 x:Name="Button_Search"
-                Width="76"
-                Height="30"
-                Margin="278,373,0,0"
+                Width="270"
+                Height="56" 
+                Margin="454,930,0,0"
                 Content="Search"
                 Style="{StaticResource RoundedButtonStyle}" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top">
         </Button>
         <Button
                 Command="{Binding UploadImageCommand}"
                 Content="Pilih Citra" 
-                Margin="41,373,0,0" 
-                Style="{StaticResource RoundedButtonStyle}" VerticalAlignment="Top" Width="125" Grid.ColumnSpan="2" HorizontalAlignment="Left"
+                Margin="232,930,1523,0" 
+                Style="{StaticResource RoundedButtonStyle}" VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="55" Grid.ColumnSpan="2"
                
-                    >
-        </Button>
+                    />
 
         <Grid VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Column="1" Margin="218,0,0,0">
             <ToggleButton 
@@ -71,7 +75,7 @@
                 Style="{StaticResource ToggleButtonStyle1}" 
                 
                 RenderTransformOrigin="0.142,3.981" 
-                Margin="-140,167,86,-182"/>
+                Margin="-64,407,-116,-457"/>
         </Grid>
     </Grid>
 </Window>

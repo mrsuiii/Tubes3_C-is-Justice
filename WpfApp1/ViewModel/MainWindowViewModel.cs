@@ -6,12 +6,17 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
+using WpfApp1.Utilities;
+using System.Drawing;
 
 namespace WpfApp1
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {
         private BitmapImage _fingerPrintImage;
+        private Bitmap bitmapFingerPrintImage;
+        private readonly ImageToAsciiConverter _converter;
+        private string typeAlgorithm;
         public BitmapImage FingerPrintImage
         {
             get => _fingerPrintImage;
@@ -32,18 +37,17 @@ namespace WpfApp1
                 OnPropertyChanged();
             }
         }
-
         public ICommand UploadImageCommand { get; }
-        public ICommand SearchCommand{ get; }
-
-        public ICommand ToggleAlgoritmaCommand{ get; }
+        public ICommand SearchCommand { get; }
+        public ICommand ToggleAlgoritmaCommand { get; }
         public MainWindowViewModel()
         {
             UploadImageCommand = new RelayCommand(_ => UploadImage());
             SearchCommand = new RelayCommand(_ => Search());
             ToggleAlgoritmaCommand = new RelayCommand(param => ToggleAlgoritma((bool)param));
+            _converter = new ImageToAsciiConverter(); 
+                    
         }
-
         public void UploadImage()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -52,6 +56,7 @@ namespace WpfApp1
             {
                 FingerPrintImage = new BitmapImage(new Uri(openFileDialog.FileName));
                 FingerPrintInputTextVisibility = Visibility.Collapsed;
+                bitmapFingerPrintImage = _converter.BitmapImageToBitmap(FingerPrintImage);
             }
         }
 
@@ -61,16 +66,31 @@ namespace WpfApp1
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
         public void Search()
-        { 
-        
-        }
-        public bool ToggleAlgoritma(bool value) 
         {
-            Debug.WriteLine(value);
-            return value;
-        
+            if (typeAlgorithm == "BM")
+            {
+                //solveBM()
+                Debug.WriteLine("BM");
+
+            }
+            else {
+                //solveKMP()
+                Debug.WriteLine("KMP");
+
+
+            }
         }
-       }
+        public void ToggleAlgoritma(bool value)
+        {
+            if (value)
+            {
+                typeAlgorithm = "BM";
+            }
+            else
+            {
+                typeAlgorithm = "KMP";
+            }
+        }
+    }
 }

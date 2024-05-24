@@ -8,6 +8,7 @@ using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using WpfApp1.Utilities;
 using System.Drawing;
+using WpfApp1.Model;
 
 namespace WpfApp1
 {
@@ -15,14 +16,25 @@ namespace WpfApp1
     {
         private BitmapImage _fingerPrintImage;
         private Bitmap bitmapFingerPrintImage;
-        private readonly ImageToAsciiConverter _converter;
+        private BitmapImage _solutionImage;
+        private ImageToAsciiConverter _converter;
         private string typeAlgorithm;
+        private MainLogic solver;
         public BitmapImage FingerPrintImage
         {
             get => _fingerPrintImage;
             set
             {
                 _fingerPrintImage = value;
+                OnPropertyChanged();
+            }
+        }
+        public BitmapImage SolutionImage
+        {
+            get => _solutionImage;
+            set
+            {
+                _solutionImage = value;
                 OnPropertyChanged();
             }
         }
@@ -37,21 +49,36 @@ namespace WpfApp1
                 OnPropertyChanged();
             }
         }
+        private Visibility _ImageSolutionTextVisibility = Visibility.Visible;
+        public Visibility ImageSolutionTextVisibility
+        {
+            get => _ImageSolutionTextVisibility;
+            set
+            {
+                _ImageSolutionTextVisibility= value;
+                OnPropertyChanged();
+            }
+        }
+
         public ICommand UploadImageCommand { get; }
         public ICommand SearchCommand { get; }
         public ICommand ToggleAlgoritmaCommand { get; }
+        
+
+
         public MainWindowViewModel()
         {
             UploadImageCommand = new RelayCommand(_ => UploadImage());
             SearchCommand = new RelayCommand(_ => Search());
             ToggleAlgoritmaCommand = new RelayCommand(param => ToggleAlgoritma((bool)param));
             _converter = new ImageToAsciiConverter(); 
+            solver = new MainLogic();
                     
         }
         public void UploadImage()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "Image files (*.jpg, *.jpeg, *.png) | *.jpg; *.jpeg; *.png";
+            openFileDialog.Filter = "BMP files (*.bmp) | *.bmp"; // Only accept BMP files
             if (openFileDialog.ShowDialog() == true)
             {
                 FingerPrintImage = new BitmapImage(new Uri(openFileDialog.FileName));
@@ -59,6 +86,7 @@ namespace WpfApp1
                 bitmapFingerPrintImage = _converter.BitmapImageToBitmap(FingerPrintImage);
             }
         }
+        
 
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -73,11 +101,18 @@ namespace WpfApp1
                 //solveBM()
                 Debug.WriteLine("BM");
 
-            }
+
+
+                //
+
+                ImageSolutionTextVisibility = Visibility.Collapsed;            }
             else {
                 //solveKMP()
                 Debug.WriteLine("KMP");
 
+
+
+                ImageSolutionTextVisibility = Visibility.Collapsed;
 
             }
         }

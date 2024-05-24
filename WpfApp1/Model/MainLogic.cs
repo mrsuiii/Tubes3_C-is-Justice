@@ -14,29 +14,33 @@ namespace WpfApp1.Model
         private BM bm;
         private KMP km;
         private LCS lcs;
-        private Bitmap[] images;
+        private Foto[] images;
+        private Db db;
         private ImageToAsciiConverter _converter;
-        private string ans;
-
+        private Foto ans;
+        private string ansPath;
+        
         public MainLogic() { 
             bm = new BM();
             km = new KMP(); 
             lcs = new LCS();
-            images = new Bitmap[1000];
+            db = new Db();
+            images = new Foto[db.GetFotos().Length];
             _converter= new ImageToAsciiConverter();
         
         }
         public void  SolveBM(Bitmap image) {
             string asciiImage = _converter.ConvertImageToAscii(image, 30);
-            string[] asciiImages = new string[images.Length];
+            
             
             bool isMatch = false;
-            for (int i = 0; i < asciiImages.Length; i++) {
+            for (int i = 0; i < images.Length; i++) {
 
-                asciiImages[i] = _converter.ConvertImageToAscii(images[i], 30);
-                if (bm.BoyerMooreSearch(asciiImage, asciiImages[i]) != -1)
-                {   
-                    ans= asciiImages[i];    
+                
+                if (bm.BoyerMooreSearch(asciiImage, images[i].getAscii()) != -1)
+                {
+                    ans = images[i];   
+                    ansPath= images[i].getPath();
                     isMatch = true;
                     break;
                 }
@@ -47,19 +51,20 @@ namespace WpfApp1.Model
             if (!isMatch)
             {
                 int commonSubseq = 0;
-                for (int i = 0; i < asciiImages.Length; i++) {
-                    int temp = lcs._lcs(asciiImage, asciiImages[i], asciiImage.Length, asciiImages[i].Length);
+                for (int i = 0; i < images.Length; i++) {
+                    int temp = lcs._lcs(asciiImage, images[i].getAscii(), asciiImage.Length, images[i].getAscii().Length);
                     if (commonSubseq < temp)
                     {
                         commonSubseq = temp;
-                        ans = asciiImages[i];
+                        ans = images[i];
                     }
            
                 }
                 
-                double percentage  = commonSubseq/ (double)ans.Length;
+                double percentage  = commonSubseq/ (double)ans.getAscii().Length;
                 if (percentage > 0.7)
                 {
+                    ansPath = ans.getPath();
 
                 }
                 else {  

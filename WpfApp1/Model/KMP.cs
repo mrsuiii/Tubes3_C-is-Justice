@@ -18,20 +18,66 @@ namespace WpfApp1.Model
             _converter = new ImageToAsciiConverter();
         }
 
-        public void SolveKMP(BitmapImage imageTarget, BitmapImage[] dataImage)
+        public int KMPSearch(string text, string pattern)
         {
-            Bitmap trgt = _converter.BitmapImageToBitmap(imageTarget);
-            string _asciiImage = _converter.ConvertImageToAscii(trgt, 30);
-            string[] _asciiImages = new string[dataImage.Length];
-            for (int i = 0; i < dataImage.Length; i++)
+            int[] lps = BorderKMP(pattern);
+            int i = 0, j = 0;
+            while (i < text.Length)
             {
-                Bitmap temp = _converter.BitmapImageToBitmap(dataImage[i]);
-                _asciiImages[i] = _converter.ConvertImageToAscii(temp, 30);
+                if (pattern[j] == text[i])
+                {
+                    i++;
+                    j++;
+                }
+                if (j == pattern.Length)
+                {
+                    return i - j;
+                }
+                else if (i < text.Length && pattern[j] != text[i])
+                {
+                    if (j != 0)
+                    {
+                        j = lps[j - 1];
+                    }
+                    else
+                    {
+                        i++;
+                    }
+                }
             }
-
-
-
+            return -1;
         }
+
+        private static int[] BorderKMP(string pattern)
+        {
+            int length = 0;
+            int i = 1;
+            int[] lps = new int[pattern.Length];
+            lps[0] = 0;
+            while (i < pattern.Length)
+            {
+                if (pattern[i] == pattern[length])
+                {
+                    length++;
+                    lps[i] = length;
+                    i++;
+                }
+                else
+                {
+                    if (length != 0)
+                    {
+                        length = lps[length - 1];
+                    }
+                    else
+                    {
+                        lps[i] = 0;
+                        i++;
+                    }
+                }
+            }
+            return lps;
+        }
+
 
 
     }

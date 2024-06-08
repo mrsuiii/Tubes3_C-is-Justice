@@ -137,42 +137,47 @@ namespace WpfApp1
         }
         public void Search()
         {
-             string basePath =  AppDomain.CurrentDomain.BaseDirectory;
+            string basePath =  AppDomain.CurrentDomain.BaseDirectory;
 
             Stopwatch stopwatch= new Stopwatch();
 
-            
+            /*
             if (typeAlgorithm == "BM")
             {
                 //solveBM()
                 Debug.WriteLine("BM");
                 stopwatch.Start();
-                _solver.SolveBM(bitmapFingerPrintImage);
-                stopwatch.Stop();
-                string matchImage = _solver.getPath();
-                
-                if (matchImage != null)
-                {
-                    matchImage = Path.Combine(basePath, matchImage);
-                    SolutionImage =  LoadBitmapImage(matchImage);
-                }
-                //
-
-
-                SearchTime = $"{stopwatch.ElapsedMilliseconds} ms";
-                MatchPercentage = $"98.76%"; // Contoh nilai, ganti dengan nilai yang sesuai
-
-                ImageSolutionTextVisibility = Visibility.Collapsed;            
+                _solver.SolveMethod(bitmapFingerPrintImage, "BM");
+                stopwatch.Stop();            
             }
             else {
                 //solveKMP()
                 Debug.WriteLine("KMP");
-
-
-
-                ImageSolutionTextVisibility = Visibility.Collapsed;
-
+                stopwatch.Start();
+                _solver.SolveMethod(bitmapFingerPrintImage, "KMP");
+                stopwatch.Stop();
             }
+            */
+
+            Debug.WriteLine(typeAlgorithm);
+            stopwatch.Start();
+            _solver.SolveMethod(bitmapFingerPrintImage, typeAlgorithm);
+            stopwatch.Stop();
+
+            string matchImage = _solver.getPath();
+
+            if (matchImage != null)
+            {
+                matchImage = Path.Combine(basePath, matchImage);
+                SolutionImage = LoadBitmapImage(matchImage);
+            }
+            //
+
+
+            SearchTime = $"{stopwatch.ElapsedMilliseconds} ms";
+            MatchPercentage = $"98.76%"; // Contoh nilai, ganti dengan nilai yang sesuai
+
+            ImageSolutionTextVisibility = Visibility.Collapsed;
         }
         public void ToggleAlgoritma(bool value)
         {

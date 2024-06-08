@@ -11,8 +11,9 @@ namespace WpfApp1.Model
 {
     public class Db
     {
-        private string connectionString = "server=localhost;user=root;password=emeryganteng;database=tubes3";
+        private string connectionString = "server=localhost;user=root;password=cu1747;database=fingerprint_db";
         private Foto[] fotos; // Array to store Foto objects
+        private Biodata[] biodatas;
 
         public void ProcessImages()
         {
@@ -24,7 +25,7 @@ namespace WpfApp1.Model
                 connection.Open();
 
                 // Retrieve path from database
-                string query = "SELECT berkas_citra FROM sidik_jari";
+                string query = "SELECT berkas_citra, nama FROM sidik_jari";
                 using (MySqlCommand command = new MySqlCommand(query, connection))
                 {
                     using (MySqlDataReader reader = command.ExecuteReader())
@@ -32,6 +33,7 @@ namespace WpfApp1.Model
                         while (reader.Read())
                         {
                             string relativeImagePath = reader.GetString("berkas_citra");
+                            string CorruptName = reader.GetString("nama");
                             relativeImagePath = relativeImagePath.Replace("/", "\\");
                             string imagePath = Path.Combine(basePath,"..\\..\\..\\", relativeImagePath);
 
@@ -49,7 +51,7 @@ namespace WpfApp1.Model
                                 string asciiArt = ConvertImageToAscii(bitmap, 100); // Width set to 100 for example
 
                                 // Construct the Foto object
-                                Foto foto = new Foto(imagePath, asciiArt);
+                                Foto foto = new Foto(imagePath, asciiArt, CorruptName);
 
                                 // Add Foto object to the list
                                 fotoList.Add(foto);
@@ -69,6 +71,58 @@ namespace WpfApp1.Model
                         // Convert list to array
                         fotos = fotoList.ToArray();
         }
+
+        public void ProcessBiodata()
+        {
+            List<Biodata> biodataList = new List<Biodata>();
+
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            {
+                connection.Open();
+
+                // Retrieve biodata from database
+                string query = "SELECT NIK, nama, tempat_lahir, tanggal_lahir, jenis_kelamin, golongan_darah, alamat, agama, status_perkawinan, pekerjaan, kewarganegaraan FROM biodata";
+                using (MySqlCommand command = new MySqlCommand(query, connection))
+                {
+                    using (MySqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            try
+                            {
+                                // Read values from database
+                                string nik = reader.GetString("NIK");
+                                string nama = reader.IsDBNull(reader.GetOrdinal("nama")) ? null : reader.GetString("nama");
+                                string tempatLahir = reader.IsDBNull(reader.GetOrdinal("tempat_lahir")) ? null : reader.GetString("tempat_lahir");
+                                string tanggalLahir = reader.IsDBNull(reader.GetOrdinal("tanggal_lahir")) ? null : reader.GetDateTime("tanggal_lahir").ToString("yyyy-MM-dd");
+                                string jenisKelamin = reader.IsDBNull(reader.GetOrdinal("jenis_kelamin")) ? null : reader.GetString("jenis_kelamin");
+                                string golonganDarah = reader.IsDBNull(reader.GetOrdinal("golongan_darah")) ? null : reader.GetString("golongan_darah");
+                                string alamat = reader.IsDBNull(reader.GetOrdinal("alamat")) ? null : reader.GetString("alamat");
+                                string agama = reader.IsDBNull(reader.GetOrdinal("agama")) ? null : reader.GetString("agama");
+                                string statusPerkawinan = reader.IsDBNull(reader.GetOrdinal("status_perkawinan")) ? null : reader.GetString("status_perkawinan");
+                                string pekerjaan = reader.IsDBNull(reader.GetOrdinal("pekerjaan")) ? null : reader.GetString("pekerjaan");
+                                string kewarganegaraan = reader.IsDBNull(reader.GetOrdinal("kewarganegaraan")) ? null : reader.GetString("kewarganegaraan");
+
+                                // Construct the Biodata object
+                                Biodata biodata = new Biodata(nik, nama, tempatLahir, tanggalLahir, jenisKelamin, golonganDarah, alamat, agama, statusPerkawinan, pekerjaan, kewarganegaraan);
+
+                                // Add Biodata object to the list
+                                biodataList.Add(biodata);
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Error processing biodata entry: {ex.Message}");
+                                continue; // Skip this entry and move to the next
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Convert list to array
+            biodatas = biodataList.ToArray();
+        }
+
         public int FotosLength() { 
             return fotos.Length;
             
@@ -76,6 +130,11 @@ namespace WpfApp1.Model
         public Foto[] GetFotos()
         {
             return fotos;
+        }
+
+        public Biodata[] GetBiodatas()
+        {
+            return biodatas;
         }
 
         private Bitmap LoadBitmap(string filePath)

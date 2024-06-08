@@ -20,6 +20,8 @@ namespace WpfApp1.Model
         private Db db;
         private ImageToAsciiConverter _converter;
         private Foto ans;
+        private Biodata bio;
+        private Alay namaasli;
         private string ansPath;
         
         public MainLogic() { 
@@ -43,6 +45,7 @@ namespace WpfApp1.Model
             }
             _converter = new ImageToAsciiConverter();
             ans = new Foto();
+            namaasli = new Alay();
             
         }
         public void  SolveMethod(Bitmap image, string type) {
@@ -115,6 +118,24 @@ namespace WpfApp1.Model
                 {
                     ansPath = ans.getPath();
 
+                    //Cari List Biodata yang sesuai
+                    string nama = namaasli.AlayTransform(ans.getName());
+                    for (int i = 0; i < profiles.Length; i++)
+                    {
+                        Debug.WriteLine("entering");
+                        int persen = kmp.KMPSearch(nama, "KMP");
+                        Debug.WriteLine(persen);
+
+
+                        if (persen != -1)
+                        {
+                            Debug.WriteLine("succes");
+                            bio = profiles[i];
+                            Debug.WriteLine(bio);
+                            break;
+                        }
+                    }
+
                 }
                 else {
                     //there is no solution
@@ -127,7 +148,27 @@ namespace WpfApp1.Model
                 Debug.WriteLine("Solution 100% matched");
                 Debug.WriteLine(ans.getPath());
                 ansPath= ans.getPath();
-            
+
+                //Cari List Biodata yang sesuai
+                string nama = namaasli.AlayTransform(ans.getName());
+                Debug.WriteLine(nama);
+                for(int i =0; i < profiles.Length; i++)
+                {
+                    Debug.WriteLine("entering");
+                    int persen = kmp.KMPSearch(profiles[i].Nama.ToLower(), nama);
+                    Debug.WriteLine(persen);
+
+
+                    if (persen != -1)
+                    {
+                        Debug.WriteLine("succes");
+                        bio = profiles[i];
+                        Debug.WriteLine(bio);
+                        break;
+                    }
+                }
+
+
             }
             
         }

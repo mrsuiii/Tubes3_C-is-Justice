@@ -30,14 +30,26 @@
 
         </Grid>
         <Grid HorizontalAlignment="Left" Background="LightGray" VerticalAlignment="Center" Margin="329,0,0,0" Height="691" Width="520" Grid.Column="1" >
-            <Image x:Name="FingerPrintMatchedHolder" Source="{Binding SolutionImage}" Stretch="Fill" Margin="0,-5,0,5"  />
+            <Image x:Name="FingerPrintMatchedHolder" Visibility="{Binding SolutionVisibility}" Source="{Binding SolutionImage}" Stretch="Fill" Margin="0,-5,0,5"  />
 
-            <TextBlock x:Name="FingerPrintMatchedText" Visibility="{Binding ImageSolutionTextVisibility}"  HorizontalAlignment="Center"  MinWidth="50" Height="15" Margin="61,138,61,123"><Run Text="Sidik Jari Cocok"/></TextBlock>
+            <TextBlock x:Name="FingerPrintMatchedText" Visibility="{Binding ImageSolutionTextVisibility}"  HorizontalAlignment="Center"  MinWidth="50" Height="15" Margin="61,138,61,123">
+                <Run Text="Sidik Jari Cocok"/>
+                
+            </TextBlock>
+            <TextBlock x:Name="FingerPrintMatch" Visibility="{Binding FingerPrintMatchDownVisibility}"  HorizontalAlignment="Center"  MinWidth="50" Height="15" Margin="61,138,61,123">
+                
+                <Run Text="{Binding FingerPrintMatch}"/>
+            </TextBlock>
 
         </Grid>
         <Grid HorizontalAlignment="Left" Background="LightGray" VerticalAlignment="Center" Margin="999,0,0,0" Height="691" Width="500" Grid.Column="1">
             <TextBlock x:Name="BiodataText" Visibility="{Binding BiodataVisibility}" HorizontalAlignment="Center" MinWidth="50" Height="15" Width="64" Margin="0,134,0,128">
-        <Run Text="List Biodata"/>
+                <Run Text="List Biodata"/>
+                
+            </TextBlock>
+            <TextBlock x:Name="BiodataMatch" Visibility="{Binding BiodataDownVisibility}" HorizontalAlignment="Center" MinWidth="50" Height="15" Width="64" Margin="0,134,0,128">
+                
+                <Run Text="{Binding BiodataMatch}"/>
             </TextBlock>
             <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10">
                 <Grid.RowDefinitions>
@@ -137,12 +149,12 @@
                 RenderTransformOrigin="0.142,3.981" 
                 Margin="-64,407,-116,-457"/>
         </Grid>
-        <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,194,72" Grid.Column="1">
-            <TextBlock Foreground="Black" FontSize="25" Width="386">
+        <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,139,76" Grid.Column="1">
+            <TextBlock Foreground="Black" FontSize="25" Width="444">
                 <Run Text="Waktu pencarian: " />
                 <Run Text="{Binding SearchTime}" />
             </TextBlock>
-            <TextBlock Foreground="Black" FontSize="25" Height="39" Width="382"><Run Text="Persentase kecocokan: " /><Run Text=" "/><Run Text="{Binding MatchPercentage}" /></TextBlock>
+            <TextBlock Foreground="Black" FontSize="25" Height="39" Width="444"><Run Text="Persentase kecocokan: " /><Run Text=" "/><Run Text="{Binding MatchPercentage}" /></TextBlock>
         </StackPanel>
 
     </Grid>

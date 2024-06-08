@@ -21,6 +21,8 @@ namespace WpfApp1
         private ImageToAsciiConverter _converter;
         private string typeAlgorithm;
         private MainLogic _solver;
+        private string _BiodataMatch;
+        private string _fingerPrintMatch;
         private string _searchTime;
         private string _matchPercentage;
         private string _BiodataNIK;
@@ -34,21 +36,19 @@ namespace WpfApp1
         private string _BiodataStatus_perkawinan;
         private string _BiodataPekerjaan;
         private string _BiodataKewarganegaraan;
-        
+        private Biodata _BiodataSolution;
 
-
-        
         public string BiodataAgama
         {
-        get => _BiodataAgama;
-            set{
+            get => _BiodataAgama;
+            set {
                 _BiodataAgama = value;
                 OnPropertyChanged();
-            } 
+            }
         }
         public string BiodataNIK
         {
-        get => _BiodataNIK;
+            get => _BiodataNIK;
             set
             {
                 _BiodataNIK = value;
@@ -144,6 +144,25 @@ namespace WpfApp1
                 OnPropertyChanged();
             }
         }
+        public string FingerPrintMatch
+        {
+            get => _fingerPrintMatch;
+            set
+            {
+                _fingerPrintMatch = value;
+                OnPropertyChanged();
+
+            }
+
+        }
+        public string BiodataMatch {
+            get => _BiodataMatch;
+            set {
+                _BiodataMatch = value;
+                OnPropertyChanged();
+            }
+
+        }
         public string SearchTime
         {
             get => _searchTime;
@@ -186,10 +205,23 @@ namespace WpfApp1
         {
             get => _BiodataVisibility;
             set { _BiodataVisibility = value;
-                OnPropertyChanged();    
-            
+                OnPropertyChanged();
+
             }
         }
+        private Visibility _BiodataDownVisibility;
+        public Visibility BiodataDownVisibility { 
+            get => _BiodataDownVisibility;
+            set
+            {
+                _BiodataDownVisibility = value;
+                OnPropertyChanged();
+            }
+        
+        
+        }
+
+
         private Visibility _fingerPrintInputTextVisibility = Visibility.Visible;
         public Visibility FingerPrintInputTextVisibility
         {
@@ -199,6 +231,30 @@ namespace WpfApp1
                 _fingerPrintInputTextVisibility = value;
                 OnPropertyChanged();
             }
+        }
+        private Visibility _FingerPrintMatchDownVisibility;
+
+        public Visibility FingerPrintMatchDownVisibility
+        {
+            get => _FingerPrintMatchDownVisibility;
+            set {
+                _FingerPrintMatchDownVisibility = value;
+                OnPropertyChanged();
+            
+            }
+        }
+        private Visibility _SolutionVisibility;
+        public Visibility SolutionVisibility
+        {
+            get => _SolutionVisibility;
+            set
+            {
+                _SolutionVisibility = value;
+                OnPropertyChanged();
+
+            }
+
+
         }
         private Visibility _ImageSolutionTextVisibility = Visibility.Visible;
         public Visibility ImageSolutionTextVisibility
@@ -224,6 +280,7 @@ namespace WpfApp1
             ToggleAlgoritmaCommand = new RelayCommand(param => ToggleAlgoritma((bool)param));
             _converter = new ImageToAsciiConverter(); 
             _solver = new MainLogic();
+            
                     
         }
         public void UploadImage()
@@ -266,42 +323,69 @@ namespace WpfApp1
         }
         public void Search()
         {
+            SolutionImage = null ;
             string basePath =  AppDomain.CurrentDomain.BaseDirectory;
-
+            BiodataVisibility = Visibility.Collapsed;
+            //SolutionVisibility = Visibility.Collapsed;
+            FingerPrintMatchDownVisibility = Visibility.Collapsed;
+            BiodataDownVisibility= Visibility.Collapsed;
             Stopwatch stopwatch= new Stopwatch();
             Debug.WriteLine(typeAlgorithm);
             stopwatch.Start();
             _solver.SolveMethod(bitmapFingerPrintImage, typeAlgorithm);
             stopwatch.Stop();
-
+            _BiodataSolution = _solver.getBio();
             string matchImage = _solver.getPath();
-
-            if (matchImage != null)
+            if (matchImage == null) {
+                ImageSolutionTextVisibility = Visibility.Collapsed; 
+                FingerPrintMatch = "Tidak ada sidik jari yang cocok";
+                FingerPrintMatchDownVisibility = Visibility.Visible;
+                //case 1: fingerprint not match
+                SearchTime = $"{stopwatch.ElapsedMilliseconds} ms";
+            }
+            else if (_BiodataSolution != null)
             {
+                ImageSolutionTextVisibility = Visibility.Collapsed;
+                SolutionVisibility= Visibility.Visible;
                 matchImage = Path.Combine(basePath, matchImage);
                 SolutionImage = LoadBitmapImage(matchImage);
+                BiodataVisibility = Visibility.Collapsed;
+                //get and set matchtime and percentage
+                SearchTime = $"{stopwatch.ElapsedMilliseconds} ms";
+                MatchPercentage = $"{_solver.getPercentage()}%";
+                //get Biodata
+                BiodataNIK =  $"NIK: {_BiodataSolution.NIK}";
+                BiodataNama = $"Nama: {_BiodataSolution.Nama} ";
+                BiodataTempat_lahir = $"Tempat Lahir: {_BiodataSolution.TempatLahir}";
+                BiodataTanggal_lahir = $"Tanggal Lahir: {_BiodataSolution.TanggalLahir}";
+                BiodataJenis_kelamin = $"Jenis Kelamin: {_BiodataSolution.JenisKelamin}";
+                BiodataGolongan_darah = $"Golongan Darah: {_BiodataSolution.GolonganDarah}";
+                BiodataAlamat = $"Alamat: {_BiodataSolution.Alamat}";
+                BiodataAgama = $"Agama: {_BiodataSolution.Agama}";
+                BiodataStatus_perkawinan = $"Status Perkawinan: {_BiodataSolution.StatusPerkawinan}";
+                BiodataPekerjaan = $"Pekerjaan: {_BiodataSolution.Pekerjaan}";
+                BiodataKewarganegaraan = $"Kewarganegaraan: {_BiodataSolution.Kewarganegaraan}";
+
             }
-            //
-            BiodataVisibility = Visibility.Collapsed;
-            //get Biodata
-            BiodataNIK = $"NIK:";
-            BiodataNama = $"cupi kodok";
-            BiodataTempat_lahir = $"jambi";
-            BiodataTanggal_lahir = $"999-666-444";
-            BiodataJenis_kelamin = $"waria";
-            BiodataGolongan_darah = $"ABC";
-            BiodataAlamat = $"Lampung gaming";
-            BiodataAgama = $"Majusi";
-            BiodataStatus_perkawinan = $"4 istri";
-            BiodataPekerjaan = $"Pengocok handal";
-            BiodataKewarganegaraan = $"Lampung Empire";
+            else
+            {   
+                SolutionVisibility= Visibility.Visible;
+                ImageSolutionTextVisibility = Visibility.Collapsed;
+                BiodataMatch = "Tidak ada Biodata yang cocok";
+                matchImage = Path.Combine(basePath, matchImage);
+                SolutionImage = LoadBitmapImage(matchImage);
+                SearchTime = $"{stopwatch.ElapsedMilliseconds} ms";
+                MatchPercentage = $"{_solver.getPercentage()}%";
+                //case 3: biodata not match
+                BiodataDownVisibility = Visibility.Visible;
+
+            }
 
 
             //
-            SearchTime = $"{stopwatch.ElapsedMilliseconds} ms";
-            MatchPercentage = $"98.76%"; // Contoh nilai, ganti dengan nilai yang sesuai
+            
 
-            ImageSolutionTextVisibility = Visibility.Collapsed;
+            
         }
         public void ToggleAlgoritma(bool value)
         {

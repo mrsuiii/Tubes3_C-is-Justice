@@ -158,6 +158,10 @@ namespace WpfApp1
                 }
                 //
 
+
+                SearchTime = $"{stopwatch.ElapsedMilliseconds} ms";
+                MatchPercentage = $"98.76%"; // Contoh nilai, ganti dengan nilai yang sesuai
+
                 ImageSolutionTextVisibility = Visibility.Collapsed;            
             }
             else {

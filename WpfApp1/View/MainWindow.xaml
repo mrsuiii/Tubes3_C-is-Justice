@@ -77,5 +77,10 @@
                 RenderTransformOrigin="0.142,3.981" 
                 Margin="-64,407,-116,-457"/>
         </Grid>
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,20" Grid.ColumnSpan="2">
+            <TextBlock x:Name="txtWaktuPencarian" Text="{Binding SearchTime}" FontSize="16" Margin="0,0,0,10"/>
+            <TextBlock x:Name="txtPersentaseKecocokan" Text="{Binding MatchPercentage}" FontSize="16"/>
+        </StackPanel>
+
     </Grid>
 </Window>

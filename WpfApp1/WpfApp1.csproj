@@ -10,7 +10,6 @@
   <ItemGroup>
     <Folder Include="Core\" />
     <Folder Include="Fonts\" />
-    <Folder Include="Images\" />
   </ItemGroup>
 
   <ItemGroup>

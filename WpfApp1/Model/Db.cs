@@ -4,18 +4,20 @@ using MySql.Data.MySqlClient;
 using System.Drawing;
 using System.Text;
 using  WpfApp1.Utilities;
-
+using System.IO;
+using System.Diagnostics;
 
 namespace WpfApp1.Model
 {
     public class Db
     {
-        private string connectionString = "server=localhost;user=root;password=cu1747;database=fingerprint_db";
+        private string connectionString = "server=localhost;user=root;password=emeryganteng;database=tubes3";
         private Foto[] fotos; // Array to store Foto objects
 
         public void ProcessImages()
         {
             List<Foto> fotoList = new List<Foto>();
+            string basePath = AppDomain.CurrentDomain.BaseDirectory;
 
             using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
@@ -29,29 +31,48 @@ namespace WpfApp1.Model
                     {
                         while (reader.Read())
                         {
-                            string imagePath = reader.GetString("berkas_citra");
+                            string relativeImagePath = reader.GetString("berkas_citra");
+                            relativeImagePath = relativeImagePath.Replace("/", "\\");
+                            string imagePath = Path.Combine(basePath,"..\\..\\..\\", relativeImagePath);
 
-                            // Load image and convert to ASCII
-                            Bitmap bitmap = LoadBitmap(imagePath);
-                            string asciiArt = ConvertImageToAscii(bitmap, 100); // Width set to 100 for example
+                            // Combine base path with the relative path to get the full path
+                            // Validate the image path
+                            if (!File.Exists(imagePath))
+                            {
+                                Debug.WriteLine($"Error: File does not exist at path {imagePath}");
+                                continue; // Skip this entry and move to the next
+                            }
+                            try
+                            {
+                                // Load image and convert to ASCII
+                                Bitmap bitmap = LoadBitmap(imagePath);
+                                string asciiArt = ConvertImageToAscii(bitmap, 100); // Width set to 100 for example
 
-                            // Construct the Foto object
-                            Foto foto = new Foto(imagePath, asciiArt);
+                                // Construct the Foto object
+                                Foto foto = new Foto(imagePath, asciiArt);
 
-                            // Add Foto object to the list
-                            fotoList.Add(foto);
+                                // Add Foto object to the list
+                                fotoList.Add(foto);
 
-                            // Print validation
-                            PrintFotoValidation(foto);
+                                // Print validation
+                                Debug.WriteLine(fotoList[fotoList.Count - 1].getPath());
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Error processing image at path {imagePath}: {ex.Message}");
+                                continue; // Skip this entry and move to the next
+                            }
                         }
                     }
                 }
             }
-
-            // Convert list to array
-            fotos = fotoList.ToArray();
+                        // Convert list to array
+                        fotos = fotoList.ToArray();
         }
-
+        public int FotosLength() { 
+            return fotos.Length;
+            
+        }
         public Foto[] GetFotos()
         {
             return fotos;
@@ -111,11 +132,7 @@ namespace WpfApp1.Model
 
         private void PrintFotoValidation(Foto foto)
         {
-            Console.WriteLine("Validating Foto Object...");
-            Console.WriteLine($"Path: {foto.Path}");
-            Console.WriteLine("ASCII Representation:");
-            Console.WriteLine(foto.AsciiRepresentation);
-            Console.WriteLine("Validation Complete.");
+            
         }
     }
 }

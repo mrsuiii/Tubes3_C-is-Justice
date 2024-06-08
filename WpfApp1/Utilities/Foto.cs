@@ -10,7 +10,11 @@ namespace WpfApp1.Utilities
     {
         public string AsciiRepresentation { get; set; }
         public string Path { get; set; }
-
+        public Foto() { 
+        Path= string.Empty;
+        AsciiRepresentation= string.Empty;
+        
+        }
         public Foto(string path, string asciiRepresentation)
         {
             Path = path;

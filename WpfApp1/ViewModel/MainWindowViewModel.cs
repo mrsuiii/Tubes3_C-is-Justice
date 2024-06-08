@@ -9,6 +9,7 @@ using System.Windows.Media.Imaging;
 using WpfApp1.Utilities;
 using System.Drawing;
 using WpfApp1.Model;
+using System.IO;
 
 namespace WpfApp1
 {
@@ -19,7 +20,28 @@ namespace WpfApp1
         private BitmapImage _solutionImage;
         private ImageToAsciiConverter _converter;
         private string typeAlgorithm;
-        private MainLogic solver;
+        private MainLogic _solver;
+        private string _searchTime;
+        private string _matchPercentage;
+        public string SearchTime
+        {
+            get => _searchTime;
+            set
+            {
+                _searchTime = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string MatchPercentage
+        {
+            get => _matchPercentage;
+            set
+            {
+                _matchPercentage = value;
+                OnPropertyChanged();
+            }
+        }
         public BitmapImage FingerPrintImage
         {
             get => _fingerPrintImage;
@@ -72,7 +94,7 @@ namespace WpfApp1
             SearchCommand = new RelayCommand(_ => Search());
             ToggleAlgoritmaCommand = new RelayCommand(param => ToggleAlgoritma((bool)param));
             _converter = new ImageToAsciiConverter(); 
-            solver = new MainLogic();
+            _solver = new MainLogic();
                     
         }
         public void UploadImage()
@@ -86,7 +108,26 @@ namespace WpfApp1
                 bitmapFingerPrintImage = _converter.BitmapImageToBitmap(FingerPrintImage);
             }
         }
-        
+
+        private BitmapImage LoadBitmapImage(string imagePath)
+        {
+            BitmapImage bitmapImage = new BitmapImage();
+
+            try
+            {
+                bitmapImage.BeginInit();
+                bitmapImage.UriSource = new Uri(imagePath, UriKind.Absolute);
+                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapImage.EndInit();
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions
+                Console.WriteLine("Error loading image: " + ex.Message);
+            }
+
+            return bitmapImage;
+        }
 
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -96,16 +137,29 @@ namespace WpfApp1
         }
         public void Search()
         {
+             string basePath =  AppDomain.CurrentDomain.BaseDirectory;
+
+            Stopwatch stopwatch= new Stopwatch();
+
+            
             if (typeAlgorithm == "BM")
             {
                 //solveBM()
                 Debug.WriteLine("BM");
-
-
-
+                stopwatch.Start();
+                _solver.SolveBM(bitmapFingerPrintImage);
+                stopwatch.Stop();
+                string matchImage = _solver.getPath();
+                
+                if (matchImage != null)
+                {
+                    matchImage = Path.Combine(basePath, matchImage);
+                    SolutionImage =  LoadBitmapImage(matchImage);
+                }
                 //
 
-                ImageSolutionTextVisibility = Visibility.Collapsed;            }
+                ImageSolutionTextVisibility = Visibility.Collapsed;            
+            }
             else {
                 //solveKMP()
                 Debug.WriteLine("KMP");

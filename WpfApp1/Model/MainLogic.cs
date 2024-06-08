@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -12,7 +13,7 @@ namespace WpfApp1.Model
     public class MainLogic
     {
         private BM bm;
-        private KMP km;
+        private KMP kmp;
         private LCS lcs;
         private Foto[] images;
         private Db db;
@@ -22,23 +23,29 @@ namespace WpfApp1.Model
         
         public MainLogic() { 
             bm = new BM();
-            km = new KMP(); 
+            kmp = new KMP(); 
             lcs = new LCS();
             db = new Db();
-            images = new Foto[db.GetFotos().Length];
+            db.ProcessImages();
+            Debug.WriteLine(db.GetFotos().Length);
+            images = db.GetFotos();
             _converter= new ImageToAsciiConverter();
-        
+            ans = new Foto();
+            
         }
         public void  SolveBM(Bitmap image) {
-            string asciiImage = _converter.ConvertImageToAscii(image, 30);
+            string asciiImage = _converter.ConvertImageToAscii(image, 100);
             
-            
+        
             bool isMatch = false;
             for (int i = 0; i < images.Length; i++) {
 
-                
-                if (bm.BoyerMooreSearch(asciiImage, images[i].getAscii()) != -1)
-                {
+                Debug.WriteLine("entering");
+                int persen = bm.BoyerMooreSearch(images[i].getAscii(), asciiImage);
+                Debug.WriteLine(persen);
+                if (persen != -1)
+                {   
+                    Debug.WriteLine("succes");
                     ans = images[i];   
                     ansPath= images[i].getPath();
                     isMatch = true;
@@ -50,34 +57,46 @@ namespace WpfApp1.Model
 
             if (!isMatch)
             {
+                Debug.WriteLine("ther is no 100%");
                 int commonSubseq = 0;
                 for (int i = 0; i < images.Length; i++) {
                     int temp = lcs._lcs(asciiImage, images[i].getAscii(), asciiImage.Length, images[i].getAscii().Length);
+                    Debug.WriteLine(temp);
                     if (commonSubseq < temp)
                     {
                         commonSubseq = temp;
                         ans = images[i];
+                        Debug.WriteLine(commonSubseq / ans.getAscii().Length);
                     }
            
                 }
                 
                 double percentage  = commonSubseq/ (double)ans.getAscii().Length;
+                Debug.WriteLine(percentage);
                 if (percentage > 0.7)
                 {
                     ansPath = ans.getPath();
 
                 }
-                else {  
+                else {
                     //there is no solution
-                    
+                    Debug.WriteLine("Not 100%");
                 }
             }
             else
             {
-                //solution is          
+                //solution is
+                Debug.WriteLine("Solution 100% matched");
+                Debug.WriteLine(ans.getPath());
+                ansPath= ans.getPath();
             
             }
             
+        }
+
+        public string getPath(){
+
+            return ansPath;
         }
     }
 }

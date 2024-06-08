@@ -23,6 +23,127 @@ namespace WpfApp1
         private MainLogic _solver;
         private string _searchTime;
         private string _matchPercentage;
+        private string _BiodataNIK;
+        private string _BiodataNama;
+        private string _BiodataTempat_lahir;
+        private string _BiodataTanggal_lahir;
+        private string _BiodataJenis_kelamin;
+        private string _BiodataGolongan_darah;
+        private string _BiodataAlamat;
+        private string _BiodataAgama;
+        private string _BiodataStatus_perkawinan;
+        private string _BiodataPekerjaan;
+        private string _BiodataKewarganegaraan;
+        
+
+
+        
+        public string BiodataAgama
+        {
+        get => _BiodataAgama;
+            set{
+                _BiodataAgama = value;
+                OnPropertyChanged();
+            } 
+        }
+        public string BiodataNIK
+        {
+        get => _BiodataNIK;
+            set
+            {
+                _BiodataNIK = value;
+                OnPropertyChanged();
+            }
+        }
+        public string BiodataNama
+        {
+            get => _BiodataNama;
+            set
+            {
+                _BiodataNama = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string BiodataTempat_lahir
+        {
+            get => _BiodataTempat_lahir;
+            set
+            {
+                _BiodataTempat_lahir = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string BiodataTanggal_lahir
+        {
+            get => _BiodataTanggal_lahir;
+            set
+            {
+                _BiodataTanggal_lahir = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string BiodataJenis_kelamin
+        {
+            get => _BiodataJenis_kelamin;
+            set
+            {
+                _BiodataJenis_kelamin = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string BiodataGolongan_darah
+        {
+            get => _BiodataGolongan_darah;
+            set
+            {
+                _BiodataGolongan_darah = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string BiodataAlamat
+        {
+            get => _BiodataAlamat;
+            set
+            {
+                _BiodataAlamat = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string BiodataStatus_perkawinan
+        {
+            get => _BiodataStatus_perkawinan;
+            set
+            {
+                _BiodataStatus_perkawinan = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string BiodataPekerjaan
+        {
+            get => _BiodataPekerjaan;
+            set
+            {
+                _BiodataPekerjaan = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string BiodataKewarganegaraan
+        {
+            get => _BiodataKewarganegaraan;
+            set
+            {
+                _BiodataKewarganegaraan = value;
+                OnPropertyChanged();
+            }
+        }
         public string SearchTime
         {
             get => _searchTime;
@@ -60,7 +181,15 @@ namespace WpfApp1
                 OnPropertyChanged();
             }
         }
-
+        private Visibility _BiodataVisibility = Visibility.Visible;
+        public Visibility BiodataVisibility
+        {
+            get => _BiodataVisibility;
+            set { _BiodataVisibility = value;
+                OnPropertyChanged();    
+            
+            }
+        }
         private Visibility _fingerPrintInputTextVisibility = Visibility.Visible;
         public Visibility FingerPrintInputTextVisibility
         {
@@ -140,25 +269,6 @@ namespace WpfApp1
             string basePath =  AppDomain.CurrentDomain.BaseDirectory;
 
             Stopwatch stopwatch= new Stopwatch();
-
-            /*
-            if (typeAlgorithm == "BM")
-            {
-                //solveBM()
-                Debug.WriteLine("BM");
-                stopwatch.Start();
-                _solver.SolveMethod(bitmapFingerPrintImage, "BM");
-                stopwatch.Stop();            
-            }
-            else {
-                //solveKMP()
-                Debug.WriteLine("KMP");
-                stopwatch.Start();
-                _solver.SolveMethod(bitmapFingerPrintImage, "KMP");
-                stopwatch.Stop();
-            }
-            */
-
             Debug.WriteLine(typeAlgorithm);
             stopwatch.Start();
             _solver.SolveMethod(bitmapFingerPrintImage, typeAlgorithm);
@@ -172,8 +282,22 @@ namespace WpfApp1
                 SolutionImage = LoadBitmapImage(matchImage);
             }
             //
+            BiodataVisibility = Visibility.Collapsed;
+            //get Biodata
+            BiodataNIK = $"NIK:";
+            BiodataNama = $"cupi kodok";
+            BiodataTempat_lahir = $"jambi";
+            BiodataTanggal_lahir = $"999-666-444";
+            BiodataJenis_kelamin = $"waria";
+            BiodataGolongan_darah = $"ABC";
+            BiodataAlamat = $"Lampung gaming";
+            BiodataAgama = $"Majusi";
+            BiodataStatus_perkawinan = $"4 istri";
+            BiodataPekerjaan = $"Pengocok handal";
+            BiodataKewarganegaraan = $"Lampung Empire";
 
 
+            //
             SearchTime = $"{stopwatch.ElapsedMilliseconds} ms";
             MatchPercentage = $"98.76%"; // Contoh nilai, ganti dengan nilai yang sesuai
 

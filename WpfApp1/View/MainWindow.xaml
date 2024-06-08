@@ -35,12 +35,72 @@
             <TextBlock x:Name="FingerPrintMatchedText" Visibility="{Binding ImageSolutionTextVisibility}"  HorizontalAlignment="Center"  MinWidth="50" Height="15" Margin="61,138,61,123"><Run Text="Sidik Jari Cocok"/></TextBlock>
 
         </Grid>
-        <Grid HorizontalAlignment="Left" Background="LightGray" VerticalAlignment="Center" Margin="999,0,0,0" Height="691" Width="500" Grid.Column="1" >
-            <Image x:Name="BiodataHolder" Stretch="Fill" Margin="477,8,-477,-8"  />
+        <Grid HorizontalAlignment="Left" Background="LightGray" VerticalAlignment="Center" Margin="999,0,0,0" Height="691" Width="500" Grid.Column="1">
+            <TextBlock x:Name="BiodataText" Visibility="{Binding BiodataVisibility}" HorizontalAlignment="Center" MinWidth="50" Height="15" Width="64" Margin="0,134,0,128">
+        <Run Text="List Biodata"/>
+            </TextBlock>
+            <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-            <TextBlock x:Name="BiodataText" HorizontalAlignment="Center" MinWidth="50" Height="15" Width="64" Margin="0,134,0,128"><Run Text="List Biodata"/></TextBlock>
-
+                <TextBlock Grid.Row="0" x:Name="NIK" Foreground="Black" FontSize="25" Margin="3,10,0,10">
+            
+            <Run Text="{Binding BiodataNIK}" />
+                </TextBlock>
+                <TextBlock Grid.Row="1" x:Name="nama" Foreground="Black" FontSize="25" Margin="3,0,0,10">
+            
+            <Run Text="{Binding BiodataNama}" />
+                </TextBlock>
+                <TextBlock Grid.Row="2" x:Name="tempat_lahir" Foreground="Black" FontSize="25" Margin="3,0,0,10">
+            
+            <Run Text="{Binding BiodataTempat_lahir}" />
+                </TextBlock>
+                <TextBlock Grid.Row="3" x:Name="tanggal_lahir" Foreground="Black" FontSize="25" Margin="3,0,0,10">
+            
+            <Run Text="{Binding BiodataTanggal_lahir}" />
+                </TextBlock>
+                <TextBlock Grid.Row="4" x:Name="jenis_kelamin" Foreground="Black" FontSize="25" Margin="3,0,0,10">
+            
+            <Run Text="{Binding BiodataJenis_kelamin}" />
+                </TextBlock>
+                <TextBlock Grid.Row="5" x:Name="golongan_darah" Foreground="Black" FontSize="25" Margin="3,0,0,10">
+            
+            <Run Text="{Binding BiodataGolongan_darah}" />
+                </TextBlock>
+                <TextBlock Grid.Row="6" x:Name="alamat" Foreground="Black" FontSize="25" Margin="3,0,0,10">
+            
+            <Run Text="{Binding BiodataAlamat}" />
+                </TextBlock>
+                <TextBlock Grid.Row="7" x:Name="agama" Foreground="Black" FontSize="25" Margin="3,0,0,10">
+            
+            <Run Text="{Binding BiodataAgama}" />
+                </TextBlock>
+                <TextBlock Grid.Row="8" x:Name="status_perkawinan" Foreground="Black" FontSize="25" Margin="3,0,0,10">
+            
+            <Run Text="{Binding BiodataStatus_perkawinan}" />
+                </TextBlock>
+                <TextBlock Grid.Row="9" x:Name="pekerjaan" Foreground="Black" FontSize="25" Margin="3,0,0,10">
+            
+            <Run Text="{Binding BiodataPekerjaan}" />
+                </TextBlock>
+                <TextBlock Grid.Row="10" x:Name="kewarganegaraan" Foreground="Black" FontSize="25" Margin="3,0,0,10">
+            
+            <Run Text="{Binding BiodataKewarganegaraan}" />
+                </TextBlock>
+            </Grid>
         </Grid>
+
         <TextBlock Text="Fingerprint Matcher"
                    Foreground="Purple"
                    FontSize="36"

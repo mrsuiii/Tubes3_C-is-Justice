@@ -270,8 +270,9 @@ namespace WpfApp1.Model
 
         public double getPercentage()
         {
-            _percentage = Math.Round(_percentage, 2);
+            
             _percentage *= 100;
+            _percentage = Math.Round(_percentage, 2);
             return _percentage;
         }
         public string getPath(){

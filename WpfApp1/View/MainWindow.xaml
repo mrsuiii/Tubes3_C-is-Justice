@@ -43,7 +43,7 @@
 
         </Grid>
         <Grid HorizontalAlignment="Left" Background="LightGray" VerticalAlignment="Center" Margin="999,0,0,0" Height="691" Width="500" Grid.Column="1">
-            <TextBlock x:Name="BiodataText" Visibility="{Binding BiodataVisibility}" HorizontalAlignment="Center" MinWidth="50" Height="15" Width="64" Margin="0,134,0,128">
+            <TextBlock x:Name="BiodataText" Visibility="{Binding BiodataListVisibility}" HorizontalAlignment="Center" MinWidth="50" Height="15" Width="64" Margin="0,134,0,128">
                 <Run Text="List Biodata"/>
                 
             </TextBlock>
@@ -51,7 +51,7 @@
                 
                 <Run Text="{Binding BiodataMatch}"/>
             </TextBlock>
-            <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10">
+            <Grid HorizontalAlignment="Stretch"   VerticalAlignment="Stretch" Margin="10">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="*"/>
@@ -66,49 +66,48 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="0" x:Name="NIK" Foreground="Black" FontSize="25" Margin="3,10,0,10">
-            
-            <Run Text="{Binding BiodataNIK}" />
+                <TextBlock Grid.Row="0" x:Name="NIK" Foreground="Black" FontSize="25" Margin="3,10,0,10" Visibility="{Binding BiodataVisibility}">
+        <Run Text="{Binding BiodataNIK}" />
                 </TextBlock>
-                <TextBlock Grid.Row="1" x:Name="nama" Foreground="Black" FontSize="25" Margin="3,0,0,10">
-            
-            <Run Text="{Binding BiodataNama}" />
+
+                <TextBlock Grid.Row="1" x:Name="nama" Foreground="Black" FontSize="25" Margin="3,0,0,10" Visibility="{Binding BiodataVisibility}">
+        <Run Text="{Binding BiodataNama}" />
                 </TextBlock>
-                <TextBlock Grid.Row="2" x:Name="tempat_lahir" Foreground="Black" FontSize="25" Margin="3,0,0,10">
-            
-            <Run Text="{Binding BiodataTempat_lahir}" />
+
+                <TextBlock Grid.Row="2" x:Name="tempat_lahir" Foreground="Black" FontSize="25" Margin="3,0,0,10" Visibility="{Binding BiodataVisibility}">
+        <Run Text="{Binding BiodataTempat_lahir}" />
                 </TextBlock>
-                <TextBlock Grid.Row="3" x:Name="tanggal_lahir" Foreground="Black" FontSize="25" Margin="3,0,0,10">
-            
-            <Run Text="{Binding BiodataTanggal_lahir}" />
+
+                <TextBlock Grid.Row="3" x:Name="tanggal_lahir" Foreground="Black" FontSize="25" Margin="3,0,0,10" Visibility="{Binding BiodataVisibility}">
+        <Run Text="{Binding BiodataTanggal_lahir}" />
                 </TextBlock>
-                <TextBlock Grid.Row="4" x:Name="jenis_kelamin" Foreground="Black" FontSize="25" Margin="3,0,0,10">
-            
-            <Run Text="{Binding BiodataJenis_kelamin}" />
+
+                <TextBlock Grid.Row="4" x:Name="jenis_kelamin" Foreground="Black" FontSize="25" Margin="3,0,0,10" Visibility="{Binding BiodataVisibility}">
+        <Run Text="{Binding BiodataJenis_kelamin}" />
                 </TextBlock>
-                <TextBlock Grid.Row="5" x:Name="golongan_darah" Foreground="Black" FontSize="25" Margin="3,0,0,10">
-            
-            <Run Text="{Binding BiodataGolongan_darah}" />
+
+                <TextBlock Grid.Row="5" x:Name="golongan_darah" Foreground="Black" FontSize="25" Margin="3,0,0,10" Visibility="{Binding BiodataVisibility}">
+        <Run Text="{Binding BiodataGolongan_darah}" />
                 </TextBlock>
-                <TextBlock Grid.Row="6" x:Name="alamat" Foreground="Black" FontSize="25" Margin="3,0,0,10">
-            
-            <Run Text="{Binding BiodataAlamat}" />
+
+                <TextBlock Grid.Row="6" x:Name="alamat" Foreground="Black" FontSize="25" Margin="3,0,0,10" Visibility="{Binding BiodataVisibility}">
+        <Run Text="{Binding BiodataAlamat}" />
                 </TextBlock>
-                <TextBlock Grid.Row="7" x:Name="agama" Foreground="Black" FontSize="25" Margin="3,0,0,10">
-            
-            <Run Text="{Binding BiodataAgama}" />
+
+                <TextBlock Grid.Row="7" x:Name="agama" Foreground="Black" FontSize="25" Margin="3,0,0,10" Visibility="{Binding BiodataVisibility}">
+        <Run Text="{Binding BiodataAgama}" />
                 </TextBlock>
-                <TextBlock Grid.Row="8" x:Name="status_perkawinan" Foreground="Black" FontSize="25" Margin="3,0,0,10">
-            
-            <Run Text="{Binding BiodataStatus_perkawinan}" />
+
+                <TextBlock Grid.Row="8" x:Name="status_perkawinan" Foreground="Black" FontSize="25" Margin="3,0,0,10" Visibility="{Binding BiodataVisibility}">
+        <Run Text="{Binding BiodataStatus_perkawinan}" />
                 </TextBlock>
-                <TextBlock Grid.Row="9" x:Name="pekerjaan" Foreground="Black" FontSize="25" Margin="3,0,0,10">
-            
-            <Run Text="{Binding BiodataPekerjaan}" />
+
+                <TextBlock Grid.Row="9" x:Name="pekerjaan" Foreground="Black" FontSize="25" Margin="3,0,0,10" Visibility="{Binding BiodataVisibility}">
+        <Run Text="{Binding BiodataPekerjaan}" />
                 </TextBlock>
-                <TextBlock Grid.Row="10" x:Name="kewarganegaraan" Foreground="Black" FontSize="25" Margin="3,0,0,10">
-            
-            <Run Text="{Binding BiodataKewarganegaraan}" />
+
+                <TextBlock Grid.Row="10" x:Name="kewarganegaraan" Foreground="Black" FontSize="25" Margin="3,0,0,10" Visibility="{Binding BiodataVisibility}">
+        <Run Text="{Binding BiodataKewarganegaraan}" />
                 </TextBlock>
             </Grid>
         </Grid>

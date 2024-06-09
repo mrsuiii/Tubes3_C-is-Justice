@@ -193,18 +193,30 @@ namespace WpfApp1
         }
         public BitmapImage SolutionImage
         {
-            get => _solutionImage;
+            get => _solutionImage; 
             set
             {
                 _solutionImage = value;
                 OnPropertyChanged();
             }
         }
-        private Visibility _BiodataVisibility = Visibility.Visible;
+
+        private Visibility _BiodataVisibility;
         public Visibility BiodataVisibility
         {
-            get => _BiodataVisibility;
-            set { _BiodataVisibility = value;
+            get=> _BiodataVisibility;
+            set
+            {
+                _BiodataVisibility = value;
+                OnPropertyChanged();
+            }
+        }
+        private Visibility _BiodataListVisibility = Visibility.Visible;
+       
+        public Visibility BiodataListVisibility
+        {
+            get => _BiodataListVisibility;
+            set { _BiodataListVisibility = value;
                 OnPropertyChanged();
 
             }
@@ -276,10 +288,14 @@ namespace WpfApp1
         public MainWindowViewModel()
         {
             UploadImageCommand = new RelayCommand(_ => UploadImage());
-            SearchCommand = new RelayCommand(_ => Search());
+            SearchCommand = new RelayCommand(_ => 
+
+                
+                Search()
+                );
             ToggleAlgoritmaCommand = new RelayCommand(param => ToggleAlgoritma((bool)param));
             _converter = new ImageToAsciiConverter(); 
-            _solver = new MainLogic();
+
             
                     
         }
@@ -294,7 +310,31 @@ namespace WpfApp1
                 bitmapFingerPrintImage = _converter.BitmapImageToBitmap(FingerPrintImage);
             }
         }
+        public void ClearPreviousResults()
+        {
+            // Reset properti atau visibilitas yang diperlukan sebelum pencarian
+            BiodataVisibility = Visibility.Collapsed;
+            SolutionVisibility = Visibility.Collapsed;
+            SolutionImage = LoadBitmapImage(null);
+            ImageSolutionTextVisibility = Visibility.Visible;
+            BiodataNIK = string.Empty;
+            BiodataNama = string.Empty;
+            BiodataTempat_lahir = string.Empty;
+            BiodataTanggal_lahir = string.Empty;
+            BiodataJenis_kelamin = string.Empty;
+            BiodataGolongan_darah = string.Empty;
+            BiodataAlamat = string.Empty;
+            BiodataAgama = string.Empty;
+            BiodataStatus_perkawinan = string.Empty;
+            BiodataPekerjaan = string.Empty;
+            BiodataKewarganegaraan = string.Empty;
 
+            BiodataListVisibility = Visibility.Visible;
+            FingerPrintMatchDownVisibility = Visibility.Collapsed;
+            BiodataDownVisibility = Visibility.Collapsed;
+
+            // Tambahkan properti lain yang perlu di-reset di sini
+        }
         private BitmapImage LoadBitmapImage(string imagePath)
         {
             BitmapImage bitmapImage = new BitmapImage();
@@ -323,12 +363,12 @@ namespace WpfApp1
         }
         public void Search()
         {
-            SolutionImage = null ;
+            ClearPreviousResults();
+            _solver = new MainLogic();    
             string basePath =  AppDomain.CurrentDomain.BaseDirectory;
-            BiodataVisibility = Visibility.Collapsed;
+            
             //SolutionVisibility = Visibility.Collapsed;
-            FingerPrintMatchDownVisibility = Visibility.Collapsed;
-            BiodataDownVisibility= Visibility.Collapsed;
+            
             Stopwatch stopwatch= new Stopwatch();
             Debug.WriteLine(typeAlgorithm);
             stopwatch.Start();
@@ -336,25 +376,29 @@ namespace WpfApp1
             stopwatch.Stop();
             _BiodataSolution = _solver.getBio();
             string matchImage = _solver.getPath();
-            if (matchImage == null) {
-                ImageSolutionTextVisibility = Visibility.Collapsed; 
+            if (matchImage == null)
+            {
+                SolutionImage = LoadBitmapImage(matchImage);
+                ImageSolutionTextVisibility = Visibility.Collapsed;
                 FingerPrintMatch = "Tidak ada sidik jari yang cocok";
                 FingerPrintMatchDownVisibility = Visibility.Visible;
                 //case 1: fingerprint not match
                 SearchTime = $"{stopwatch.ElapsedMilliseconds} ms";
+                MatchPercentage = $"{_solver.getPercentage()}%";
             }
             else if (_BiodataSolution != null)
             {
                 ImageSolutionTextVisibility = Visibility.Collapsed;
-                SolutionVisibility= Visibility.Visible;
+                SolutionVisibility = Visibility.Visible;
+                BiodataVisibility = Visibility.Visible;
                 matchImage = Path.Combine(basePath, matchImage);
                 SolutionImage = LoadBitmapImage(matchImage);
-                BiodataVisibility = Visibility.Collapsed;
+                BiodataListVisibility = Visibility.Collapsed;
                 //get and set matchtime and percentage
                 SearchTime = $"{stopwatch.ElapsedMilliseconds} ms";
                 MatchPercentage = $"{_solver.getPercentage()}%";
                 //get Biodata
-                BiodataNIK =  $"NIK: {_BiodataSolution.NIK}";
+                BiodataNIK = $"NIK: {_BiodataSolution.NIK}";
                 BiodataNama = $"Nama: {_BiodataSolution.Nama} ";
                 BiodataTempat_lahir = $"Tempat Lahir: {_BiodataSolution.TempatLahir}";
                 BiodataTanggal_lahir = $"Tanggal Lahir: {_BiodataSolution.TanggalLahir}";
@@ -368,8 +412,8 @@ namespace WpfApp1
 
             }
             else
-            {   
-                SolutionVisibility= Visibility.Visible;
+            {
+                SolutionVisibility = Visibility.Visible;
                 ImageSolutionTextVisibility = Visibility.Collapsed;
                 BiodataMatch = "Tidak ada Biodata yang cocok";
                 matchImage = Path.Combine(basePath, matchImage);
@@ -380,12 +424,6 @@ namespace WpfApp1
                 BiodataDownVisibility = Visibility.Visible;
 
             }
-
-
-            //
-            
-
-            
         }
         public void ToggleAlgoritma(bool value)
         {

@@ -307,6 +307,9 @@ namespace WpfApp1
 
             foto = db.GetFotos();
             bio = db.GetBiodatas();
+            foreach(Biodata bios in bio) {
+                Debug.WriteLine(bios);
+            }
                     
         }
         public void UploadImage()
@@ -378,6 +381,7 @@ namespace WpfApp1
             string basePath =  AppDomain.CurrentDomain.BaseDirectory;
             
             //SolutionVisibility = Visibility.Collapsed;
+
             
             Stopwatch stopwatch= new Stopwatch();
             Debug.WriteLine(typeAlgorithm);

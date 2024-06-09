@@ -49,11 +49,6 @@ Run
 dotnet run --project WpfApp1/WpfApp1.cspro
 ```
 
-Database
-```shell
-dotnet run --project WpfApp1/WpfApp1.cspro
-```
-
 ## Project Status
 Project ini : Selesai.
 

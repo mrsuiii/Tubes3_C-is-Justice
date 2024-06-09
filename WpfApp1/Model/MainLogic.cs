@@ -29,11 +29,14 @@ namespace WpfApp1.Model
             kmp = new KMP(); 
             lcs = new LCS();
             db = new Db();
-            db.ProcessImages();
-            db.ProcessBiodata();
-            Debug.WriteLine(db.GetFotos().Length);
-            images = db.GetFotos();
-            profiles = db.GetBiodatas();
+            db.InsertImagePathsAndNames();
+            //db.ProcessImages();
+            //db.ProcessBiodata();
+
+            //Debug.WriteLine(db.GetFotos().Length);
+            //images = db.GetFotos();
+            //profiles = db.GetBiodatas();
+            /*
             foreach (var biodata in profiles)
             {
                 Debug.WriteLine(biodata.ToString());
@@ -43,6 +46,7 @@ namespace WpfApp1.Model
             {
                 Debug.WriteLine(foto.ToString());
             }
+            */
             _converter = new ImageToAsciiConverter();
             ans = new Foto();
             namaasli = new Alay();

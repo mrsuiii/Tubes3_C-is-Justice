@@ -14,6 +14,7 @@ namespace WpfApp1.Model
         private string connectionString = "server=localhost;user=root;password=cu1747;database=fingerprint_db";
         private Foto[] fotos; // Array to store Foto objects
         private Biodata[] biodatas;
+        private Alay alayconvert;
 
         public void ProcessImages()
         {
@@ -123,6 +124,92 @@ namespace WpfApp1.Model
             biodatas = biodataList.ToArray();
         }
 
+        public void InsertImagePathsAndNames()
+        {
+            string folderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\..\\fingerprint");
+            if (!Directory.Exists(folderPath))
+            {
+                Debug.WriteLine("Folder not found.");
+                return;
+            }
+
+            string[] files = Directory.GetFiles(folderPath, "*.BMP");
+            Array.Sort(files); // Sort files alphabetically
+            Debug.WriteLine(files[0]);
+
+            // Generate 600 names
+            List<string> names = GenerateNames(600);
+
+            List<(string asciichar, string Path, string Name)> filePathNamePairs = new List<(string asciichar, string Path, string Name)>();
+
+            // Assign names based on index
+            for (int i = 0; i < files.Length; i++)
+            {
+                int nameIndex = i / 10; // Assign a new name every 10 files
+                if (nameIndex < names.Count)
+                {
+                    string fileName = Path.GetFileName(files[i]);
+                    string relativePath = Path.Combine("fingerprint", fileName).Replace("\\", "/");
+                    string name = names[nameIndex];
+                    string imagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\..\\", files[i]);
+                    Bitmap bitmap = LoadBitmap(imagePath);
+                    string asciiArt = ConvertImageToAscii(bitmap, 100); // Width set to 100 for example
+                    //string asciiArt = "Asu";
+                    filePathNamePairs.Add((asciiArt, relativePath, name));
+                }
+            }
+
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            {
+                connection.Open();
+
+                foreach (var pair in filePathNamePairs)
+                {
+                    string query = "INSERT INTO sidik_jari (berkas_citra, nama, path_citra) VALUES (@berkas_citra, @nama, @path_citra)";
+                    using (MySqlCommand command = new MySqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@berkas_citra", pair.asciichar);
+                        command.Parameters.AddWithValue("@nama", pair.Name);
+                        command.Parameters.AddWithValue("@path_citra", pair.Path);
+                        command.ExecuteNonQuery();
+                    }
+                }
+            }
+        }
+
+        private List<string> GenerateNames(int count)
+        {
+            string[] firstNames =
+            {
+                "John", "Jane", "Michael", "Sarah", "David", "Emily", "Chris", "Emma", "Daniel", "Olivia",
+                "James", "Sophia", "Robert", "Isabella", "William", "Mia", "Joseph", "Amelia", "Charles", "Charlotte",
+                "Henry", "Grace", "Alexander", "Victoria", "Samuel", "Abigail", "Anthony", "Evelyn", "Thomas", "Ella",
+                "Andrew", "Harper", "Joshua", "Lily", "Matthew", "Aria", "Benjamin", "Zoey", "Ryan", "Penelope",
+                "Jacob", "Hannah", "Logan", "Avery", "Jack", "Riley", "Lucas", "Ellie", "Brian", "Nora"
+            };
+
+            string[] lastNames =
+            {
+                "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez",
+                "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson", "Thomas", "Taylor", "Moore", "Jackson", "Martin",
+                "Lee", "Perez", "Thompson", "White", "Harris", "Sanchez", "Clark", "Ramirez", "Lewis", "Robinson",
+                "Walker", "Young", "Allen", "King", "Wright", "Scott", "Torres", "Nguyen", "Hill", "Flores",
+                "Green", "Adams", "Nelson", "Baker", "Hall", "Rivera", "Campbell", "Mitchell", "Carter", "Roberts"
+            };
+
+            Random rand = new Random();
+            List<string> names = new List<string>();
+
+            for (int i = 0; i < count; i++)
+            {
+                string firstName = firstNames[rand.Next(firstNames.Length)];
+                string lastName = lastNames[rand.Next(lastNames.Length)];
+                names.Add($"{firstName} {lastName}");
+            }
+
+            return names;
+        }
+
         public int FotosLength() { 
             return fotos.Length;
             
@@ -193,5 +280,6 @@ namespace WpfApp1.Model
         {
             
         }
+
     }
 }

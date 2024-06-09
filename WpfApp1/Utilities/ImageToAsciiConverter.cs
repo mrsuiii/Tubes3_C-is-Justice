@@ -20,7 +20,7 @@ namespace WpfApp1.Utilities
             StringBuilder asciiArt = new StringBuilder();
 
             asciiArt.Append(BinaryToAscii(binaryImage));
-            Debug.WriteLine(asciiArt.ToString());
+            //Debug.WriteLine(asciiArt.ToString());
             return asciiArt.ToString();
         }
         public string[] ConvertImageToAsciiArray(Bitmap image)
@@ -31,7 +31,7 @@ namespace WpfApp1.Utilities
             // Mengambil substring 64-bit terbaik dari string biner
            
             string asciiString = BinaryToAscii(binaryString);
-            string[] best64BitSubstrings = GetBestSubstrings(asciiString, 16, 25);
+            string[] best64BitSubstrings = GetBestSubstrings(asciiString, 16, 15);
             // Mengonversi setiap substring biner menjadi ASCII
             string[] asciiArtArray = new string[best64BitSubstrings.Length];
             for (int i = 0; i < best64BitSubstrings.Length; i++)
@@ -71,8 +71,8 @@ namespace WpfApp1.Utilities
                     binaryString.Append(grayValue > 127 ? '1' : '0');
                 }
             }
-            Debug.WriteLine(binaryString.ToString());
-            Debug.WriteLine(binaryString.ToString().Length);
+           // Debug.WriteLine(binaryString.ToString());
+           // Debug.WriteLine(binaryString.ToString().Length);
             return binaryString.ToString();
         }
 
@@ -94,7 +94,7 @@ namespace WpfApp1.Utilities
             }
             // Mengurutkan substring berdasarkan skor uniformitas (yang paling dekat dengan 0.5)
             var bestSubstrings = substrings.OrderBy(s => Math.Abs(s.Item2 - 0.5)).Take(count).Select(s => s.Item1).ToArray();
-            Debug.WriteLine(bestSubstrings);
+            //Debug.WriteLine(bestSubstrings);
             return bestSubstrings;
         }
 

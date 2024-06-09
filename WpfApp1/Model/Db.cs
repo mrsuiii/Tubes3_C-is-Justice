@@ -60,7 +60,7 @@ namespace WpfApp1.Model
                                 fotoList.Add(foto);
 
                                 // Print validation
-                                Debug.WriteLine(fotoList[fotoList.Count - 1].getPath());
+                                //Debug.WriteLine(fotoList[fotoList.Count - 1].getPath());
                             }
                             catch (Exception ex)
                             {
@@ -100,30 +100,55 @@ namespace WpfApp1.Model
                         {
                             try
                             {
-                                // Read values from database
-                                string nik = AES.aes128_decrypt(reader.GetString("NIK"), key);
-                                string nama = AES.aes128_decrypt(reader.IsDBNull(reader.GetOrdinal("nama")) ? null : reader.GetString("nama"), key);
-                                string tempatLahir = AES.aes128_decrypt(reader.IsDBNull(reader.GetOrdinal("tempat_lahir")) ? null : reader.GetString("tempat_lahir"), key);
-                                string tanggalLahir = AES.aes128_decrypt(reader.IsDBNull(reader.GetOrdinal("tanggal_lahir")) ? null : reader.GetDateTime("tanggal_lahir").ToString("yyyy-MM-dd"), key);
-                                string jenisKelamin = AES.aes128_decrypt(reader.IsDBNull(reader.GetOrdinal("jenis_kelamin")) ? null : reader.GetString("jenis_kelamin"), key);
-                                string golonganDarah = AES.aes128_decrypt(reader.IsDBNull(reader.GetOrdinal("golongan_darah")) ? null : reader.GetString("golongan_darah"), key);
-                                string alamat = AES.aes128_decrypt(reader.IsDBNull(reader.GetOrdinal("alamat")) ? null : reader.GetString("alamat"),key);
-                                string agama = AES.aes128_decrypt(reader.IsDBNull(reader.GetOrdinal("agama")) ? null : reader.GetString("agama"), key);
-                                string statusPerkawinan = AES.aes128_decrypt(reader.IsDBNull(reader.GetOrdinal("status_perkawinan")) ? null : reader.GetString("status_perkawinan"), key);
-                                string pekerjaan = AES.aes128_decrypt(reader.IsDBNull(reader.GetOrdinal("pekerjaan")) ? null : reader.GetString("pekerjaan"), key);
-                                string kewarganegaraan = AES.aes128_decrypt(reader.IsDBNull(reader.GetOrdinal("kewarganegaraan")) ? null : reader.GetString("kewarganegaraan"), key);
+                                string nik = reader.IsDBNull(reader.GetOrdinal("NIK")) ? null : AES.aes128_decrypt(reader.GetString("NIK"), key);
+                                Debug.WriteLine($"NIK: {nik}");
+
+                                string nama = reader.IsDBNull(reader.GetOrdinal("nama")) ? null : AES.aes128_decrypt(reader.GetString("nama"), key);
+                                Debug.WriteLine($"Nama: {nama}");
+
+                                string tempatLahir = reader.IsDBNull(reader.GetOrdinal("tempat_lahir")) ? null : AES.aes128_decrypt(reader.GetString("tempat_lahir"), key);
+                                Debug.WriteLine($"Tempat Lahir: {tempatLahir}");
+
+                                string tanggalLahir = reader.IsDBNull(reader.GetOrdinal("tanggal_lahir")) ? null : AES.aes128_decrypt(reader.GetString("tanggal_lahir"), key);
+                                Debug.WriteLine($"Tanggal Lahir: {tanggalLahir}");
+
+                                string jenisKelamin = reader.IsDBNull(reader.GetOrdinal("jenis_kelamin")) ? null : reader.GetString("jenis_kelamin");
+                                Debug.WriteLine($"Jenis Kelamin: {jenisKelamin}");
+
+                                string golonganDarah = reader.IsDBNull(reader.GetOrdinal("golongan_darah")) ? null : AES.aes128_decrypt(reader.GetString("golongan_darah"), key);
+                                Debug.WriteLine($"Golongan Darah: {golonganDarah}");
+
+                                string alamat = reader.IsDBNull(reader.GetOrdinal("alamat")) ? null : AES.aes128_decrypt(reader.GetString("alamat"), key);
+                                Debug.WriteLine($"Alamat: {alamat}");
+
+                                string agama = reader.IsDBNull(reader.GetOrdinal("agama")) ? null : AES.aes128_decrypt(reader.GetString("agama"), key);
+                                Debug.WriteLine($"Agama: {agama}");
+
+                                string statusPerkawinan = reader.IsDBNull(reader.GetOrdinal("status_perkawinan")) ? null : reader.GetString("status_perkawinan");
+                                Debug.WriteLine($"Status Perkawinan: {statusPerkawinan}");
+
+                                string pekerjaan = reader.IsDBNull(reader.GetOrdinal("pekerjaan")) ? null : AES.aes128_decrypt(reader.GetString("pekerjaan"), key);
+                                Debug.WriteLine($"Pekerjaan: {pekerjaan}");
+
+                                string kewarganegaraan = reader.IsDBNull(reader.GetOrdinal("kewarganegaraan")) ? null : AES.aes128_decrypt(reader.GetString("kewarganegaraan"), key);
+                                Debug.WriteLine($"Kewarganegaraan: {kewarganegaraan}");
 
                                 // Construct the Biodata object
                                 Biodata biodata = new Biodata(nik, nama, tempatLahir, tanggalLahir, jenisKelamin, golonganDarah, alamat, agama, statusPerkawinan, pekerjaan, kewarganegaraan);
-
+                                
                                 // Add Biodata object to the list
                                 biodataList.Add(biodata);
+                            }
+                            catch (FormatException ex)
+                            {
+                                Console.WriteLine($"Error processing biodata entry: {ex.Message}");
                             }
                             catch (Exception ex)
                             {
                                 Console.WriteLine($"Error processing biodata entry: {ex.Message}");
                                 continue; // Skip this entry and move to the next
                             }
+                           
                         }
                     }
                 }
@@ -153,10 +178,10 @@ namespace WpfApp1.Model
             List<string> names = GenerateNames(600);
 
             // Assign names based on index
-            for (int i = 0; i < 40; i++)
+            for (int i = 0; i <files.Length; i++)
             {
                 int nameIndex = i / 10;
-                Debug.WriteLine(nameIndex);
+                //Debug.WriteLine(nameIndex);
                 if (nameIndex < names.Count)
                 {
                     string fileName = Path.GetFileName(files[i]);
@@ -176,7 +201,7 @@ namespace WpfApp1.Model
                 }
             }
 
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 600; i++)
             {
                 InsertBiodata(names[i]);
             }

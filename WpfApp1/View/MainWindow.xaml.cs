@@ -24,13 +24,13 @@ namespace WpfApp1.View
     /// </summary>
     public partial class MainWindow : Window
     {
-        private MainWindowViewModel _viewModel;
+       // private MainWindowViewModel _viewModel = new MainWindowViewModel();
 
         public MainWindow()
         {
             InitializeComponent();
-            _viewModel = new MainWindowViewModel();
-            DataContext = _viewModel;
+            //_viewModel = new MainWindowViewModel();
+            
         }
 
 

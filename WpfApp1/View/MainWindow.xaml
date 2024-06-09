@@ -34,7 +34,7 @@
 
             <TextBlock x:Name="FingerPrintMatchedText" Visibility="{Binding ImageSolutionTextVisibility}"  HorizontalAlignment="Center"  MinWidth="50" Height="15" Margin="61,138,61,123">
                 <Run Text="Sidik Jari Cocok"/>
-                
+
             </TextBlock>
             <TextBlock x:Name="FingerPrintMatch" Visibility="{Binding FingerPrintMatchDownVisibility}"  HorizontalAlignment="Center"  MinWidth="50" Height="15" Margin="61,138,61,123">
                 
@@ -45,9 +45,9 @@
         <Grid HorizontalAlignment="Left" Background="LightGray" VerticalAlignment="Center" Margin="999,0,0,0" Height="691" Width="500" Grid.Column="1">
             <TextBlock x:Name="BiodataText" Visibility="{Binding BiodataListVisibility}" HorizontalAlignment="Center" MinWidth="50" Height="15" Width="64" Margin="0,134,0,128">
                 <Run Text="List Biodata"/>
-                
+
             </TextBlock>
-            <TextBlock x:Name="BiodataMatch" Visibility="{Binding BiodataDownVisibility}" HorizontalAlignment="Center" MinWidth="50" Height="15" Width="64" Margin="0,134,0,128">
+            <TextBlock x:Name="BiodataMatch" Visibility="{Binding BiodataDownVisibility}" HorizontalAlignment="Center" MinWidth="50" Height="15" Width="300" Margin="0,341,0,335">
                 
                 <Run Text="{Binding BiodataMatch}"/>
             </TextBlock>

@@ -10,6 +10,7 @@ using WpfApp1.Utilities;
 using System.Drawing;
 using WpfApp1.Model;
 using System.IO;
+using System.Reflection.Metadata;
 
 namespace WpfApp1
 {
@@ -300,7 +301,7 @@ namespace WpfApp1
             _converter = new ImageToAsciiConverter();
 
             Db db = new Db();
-            db.InsertImagePathsAndNames();
+            //db.InsertImagePathsAndNames();
             db.ProcessImages();
             db.ProcessBiodata();
 
@@ -373,7 +374,7 @@ namespace WpfApp1
         public void Search()
         {
             ClearPreviousResults();
-            _solver = new MainLogic(foto, bio);    
+            _solver = new MainLogic();    
             string basePath =  AppDomain.CurrentDomain.BaseDirectory;
             
             //SolutionVisibility = Visibility.Collapsed;
@@ -381,7 +382,7 @@ namespace WpfApp1
             Stopwatch stopwatch= new Stopwatch();
             Debug.WriteLine(typeAlgorithm);
             stopwatch.Start();
-            _solver.SolveMethod(bitmapFingerPrintImage, typeAlgorithm);
+            _solver.SolveMethod(bitmapFingerPrintImage, typeAlgorithm, foto,bio);
             stopwatch.Stop();
             _BiodataSolution = _solver.getBio();
             string matchImage = _solver.getPath();
@@ -408,7 +409,7 @@ namespace WpfApp1
                 MatchPercentage = $"{_solver.getPercentage()}%";
                 //get Biodata
                 BiodataNIK = $"NIK: {_BiodataSolution.NIK}";
-                BiodataNama = $"Nama: {_BiodataSolution.Nama} ";
+                BiodataNama = $"Nama: {_solver.nama()} ";
                 BiodataTempat_lahir = $"Tempat Lahir: {_BiodataSolution.TempatLahir}";
                 BiodataTanggal_lahir = $"Tanggal Lahir: {_BiodataSolution.TanggalLahir}";
                 BiodataJenis_kelamin = $"Jenis Kelamin: {_BiodataSolution.JenisKelamin}";
@@ -422,6 +423,7 @@ namespace WpfApp1
             }
             else
             {
+                BiodataListVisibility = Visibility.Collapsed;
                 SolutionVisibility = Visibility.Visible;
                 ImageSolutionTextVisibility = Visibility.Collapsed;
                 BiodataMatch = "Tidak ada Biodata yang cocok";

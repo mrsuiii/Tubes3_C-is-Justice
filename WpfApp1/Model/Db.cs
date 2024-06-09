@@ -13,16 +13,16 @@ namespace WpfApp1.Model
 {
     public class Db
     {
-        private string connectionString = "server=localhost;user=root;password=cu1747;database=fingerprint_db";
+        private string connectionString = "server=localhost;user=root;password=emeryganteng;database=tubes3";
         private Foto[] fotos; // Array to store Foto objects
         private Biodata[] biodatas;
         private Alay alayconvert;
-
+        private ImageToAsciiConverter _converter;
         public void ProcessImages()
         {
             List<Foto> fotoList = new List<Foto>();
             string basePath = AppDomain.CurrentDomain.BaseDirectory;
-
+            _converter = new ImageToAsciiConverter();
             using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
                 connection.Open();
@@ -51,7 +51,7 @@ namespace WpfApp1.Model
                             {
                                 // Load image and convert to ASCII
                                 Bitmap bitmap = LoadBitmap(imagePath);
-                                string asciiArt = ConvertImageToAscii(bitmap, 100); // Width set to 100 for example
+                                string asciiArt = _converter.ConvertImageToAscii(bitmap); 
 
                                 // Construct the Foto object
                                 Foto foto = new Foto(imagePath, asciiArt, CorruptName);
@@ -153,7 +153,7 @@ namespace WpfApp1.Model
             List<string> names = GenerateNames(600);
 
             // Assign names based on index
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 40; i++)
             {
                 int nameIndex = i / 10;
                 Debug.WriteLine(nameIndex);
@@ -186,7 +186,7 @@ namespace WpfApp1.Model
         {
             Random rnd = new Random();
 
-            Alay alayconvert = new Alay();
+            alayconvert = new Alay();
             nama = alayconvert.NormalToAlay(nama);
 
             byte[] key = new byte[] {
@@ -382,34 +382,7 @@ namespace WpfApp1.Model
             return new Bitmap(filePath);
         }
 
-        private string ConvertImageToAscii(Bitmap image, int width)
-        {
-            // Resize image to the specified width while maintaining aspect ratio
-            int height = (int)((double)image.Height / image.Width * width);
-            using (Bitmap resizedImage = new Bitmap(image, new Size(width, height)))
-            {
-                // Convert to grayscale
-                using (Bitmap grayscaleImage = ConvertToGrayscale(resizedImage))
-                {
-                    // Convert to ASCII
-                    StringBuilder asciiArt = new StringBuilder();
-                    char[] asciiChars = { '@', '#', 'S', '%', '?', '*', '+', ';', ':', ',', '.' };
-                    for (int y = 0; y < grayscaleImage.Height; y++)
-                    {
-                        for (int x = 0; x < grayscaleImage.Width; x++)
-                        {
-                            Color pixelColor = grayscaleImage.GetPixel(x, y);
-                            int grayValue = pixelColor.R; // Since it's grayscale, R, G, and B values are the same
-                            int asciiIndex = grayValue * (asciiChars.Length - 1) / 255;
-                            asciiArt.Append(asciiChars[asciiIndex]);
-                        }
-                        asciiArt.AppendLine();
-                    }
-
-                    return asciiArt.ToString();
-                }
-            }
-        }
+       
 
         private Bitmap ConvertToGrayscale(Bitmap original)
         {

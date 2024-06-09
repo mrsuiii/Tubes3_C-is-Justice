@@ -30,8 +30,9 @@ namespace WpfApp1.Model
             kmp = new KMP(); 
             lcs = new LCS();
             db = new Db();
-            images = fotos;
-            profiles = bio;
+            images = null;
+            profiles = null;
+            /*
             foreach (var biodata in profiles)
             {
                 Debug.WriteLine(biodata.ToString());
@@ -41,6 +42,7 @@ namespace WpfApp1.Model
             {
                 Debug.WriteLine(foto.ToString());
             }
+            */
 
             _converter = new ImageToAsciiConverter();
             ans = new Foto();

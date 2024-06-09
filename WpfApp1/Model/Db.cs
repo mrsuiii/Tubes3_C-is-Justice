@@ -6,6 +6,8 @@ using System.Text;
 using WpfApp1.Utilities;
 using System.IO;
 using System.Diagnostics;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace WpfApp1.Model
 {
@@ -77,6 +79,13 @@ namespace WpfApp1.Model
         {
             List<Biodata> biodataList = new List<Biodata>();
 
+            byte[] key = new byte[] {
+                0x00, 0x01, 0x02, 0x03,
+                0x04, 0x05, 0x06, 0x07,
+                0x08, 0x09, 0x0A, 0x0B,
+                0x0C, 0x0D, 0x0E, 0x0F
+            };
+
             using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
                 connection.Open();
@@ -92,17 +101,17 @@ namespace WpfApp1.Model
                             try
                             {
                                 // Read values from database
-                                string nik = reader.GetString("NIK");
-                                string nama = reader.IsDBNull(reader.GetOrdinal("nama")) ? null : reader.GetString("nama");
-                                string tempatLahir = reader.IsDBNull(reader.GetOrdinal("tempat_lahir")) ? null : reader.GetString("tempat_lahir");
-                                string tanggalLahir = reader.IsDBNull(reader.GetOrdinal("tanggal_lahir")) ? null : reader.GetDateTime("tanggal_lahir").ToString("yyyy-MM-dd");
-                                string jenisKelamin = reader.IsDBNull(reader.GetOrdinal("jenis_kelamin")) ? null : reader.GetString("jenis_kelamin");
-                                string golonganDarah = reader.IsDBNull(reader.GetOrdinal("golongan_darah")) ? null : reader.GetString("golongan_darah");
-                                string alamat = reader.IsDBNull(reader.GetOrdinal("alamat")) ? null : reader.GetString("alamat");
-                                string agama = reader.IsDBNull(reader.GetOrdinal("agama")) ? null : reader.GetString("agama");
-                                string statusPerkawinan = reader.IsDBNull(reader.GetOrdinal("status_perkawinan")) ? null : reader.GetString("status_perkawinan");
-                                string pekerjaan = reader.IsDBNull(reader.GetOrdinal("pekerjaan")) ? null : reader.GetString("pekerjaan");
-                                string kewarganegaraan = reader.IsDBNull(reader.GetOrdinal("kewarganegaraan")) ? null : reader.GetString("kewarganegaraan");
+                                string nik = AES.aes128_decrypt(reader.GetString("NIK"), key);
+                                string nama = AES.aes128_decrypt(reader.IsDBNull(reader.GetOrdinal("nama")) ? null : reader.GetString("nama"), key);
+                                string tempatLahir = AES.aes128_decrypt(reader.IsDBNull(reader.GetOrdinal("tempat_lahir")) ? null : reader.GetString("tempat_lahir"), key);
+                                string tanggalLahir = AES.aes128_decrypt(reader.IsDBNull(reader.GetOrdinal("tanggal_lahir")) ? null : reader.GetDateTime("tanggal_lahir").ToString("yyyy-MM-dd"), key);
+                                string jenisKelamin = AES.aes128_decrypt(reader.IsDBNull(reader.GetOrdinal("jenis_kelamin")) ? null : reader.GetString("jenis_kelamin"), key);
+                                string golonganDarah = AES.aes128_decrypt(reader.IsDBNull(reader.GetOrdinal("golongan_darah")) ? null : reader.GetString("golongan_darah"), key);
+                                string alamat = AES.aes128_decrypt(reader.IsDBNull(reader.GetOrdinal("alamat")) ? null : reader.GetString("alamat"),key);
+                                string agama = AES.aes128_decrypt(reader.IsDBNull(reader.GetOrdinal("agama")) ? null : reader.GetString("agama"), key);
+                                string statusPerkawinan = AES.aes128_decrypt(reader.IsDBNull(reader.GetOrdinal("status_perkawinan")) ? null : reader.GetString("status_perkawinan"), key);
+                                string pekerjaan = AES.aes128_decrypt(reader.IsDBNull(reader.GetOrdinal("pekerjaan")) ? null : reader.GetString("pekerjaan"), key);
+                                string kewarganegaraan = AES.aes128_decrypt(reader.IsDBNull(reader.GetOrdinal("kewarganegaraan")) ? null : reader.GetString("kewarganegaraan"), key);
 
                                 // Construct the Biodata object
                                 Biodata biodata = new Biodata(nik, nama, tempatLahir, tanggalLahir, jenisKelamin, golonganDarah, alamat, agama, statusPerkawinan, pekerjaan, kewarganegaraan);
@@ -126,6 +135,8 @@ namespace WpfApp1.Model
 
         public void InsertImagePathsAndNames()
         {
+            Debug.WriteLine("Starting the InsertImagePathsAndNames function.");
+
             string folderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\..\\fingerprint");
             if (!Directory.Exists(folderPath))
             {
@@ -134,47 +145,40 @@ namespace WpfApp1.Model
             }
 
             string[] files = Directory.GetFiles(folderPath, "*.BMP");
-            Array.Sort(files); // Sort files alphabetically
-            Debug.WriteLine(files[0]);
+            // Sort files based on the numeric value in their name
+            files = files.OrderBy(f => ExtractLeadingNumber(Path.GetFileName(f))).ThenBy(f => f).ToArray();
+            Debug.WriteLine(files.Length);
 
             // Generate 600 names
             List<string> names = GenerateNames(600);
 
-            List<(string Path, string Name)> filePathNamePairs = new List<(string Path, string Name)>();
-
             // Assign names based on index
-            for (int i = 0; i < files.Length; i++)
+            for (int i = 0; i < 10; i++)
             {
-                int nameIndex = i / 10; // Assign a new name every 10 files
+                int nameIndex = i / 10;
+                Debug.WriteLine(nameIndex);
                 if (nameIndex < names.Count)
                 {
                     string fileName = Path.GetFileName(files[i]);
                     string relativePath = Path.Combine("fingerprint", fileName).Replace("\\", "/");
                     string name = names[nameIndex];
-                    //string asciiArt = "Asu";
-                    filePathNamePairs.Add((relativePath, name));
-                }
-            }
-
-            for (int i = 0; i < 600; i++)
-            {
-                InsertBiodata(names[i]);
-            }
-
-            using (MySqlConnection connection = new MySqlConnection(connectionString))
-            {
-                connection.Open();
-
-                foreach (var pair in filePathNamePairs)
-                {
-                    string query = "INSERT INTO sidik_jari (berkas_citra, nama) VALUES (@berkas_citra, @nama)";
-                    using (MySqlCommand command = new MySqlCommand(query, connection))
+                    using (MySqlConnection connection = new MySqlConnection(connectionString))
                     {
-                        command.Parameters.AddWithValue("@berkas_citra", pair.Path);
-                        command.Parameters.AddWithValue("@nama", pair.Name);
-                        command.ExecuteNonQuery();
+                        connection.Open();
+                        string query = "INSERT INTO sidik_jari (berkas_citra, nama) VALUES (@berkas_citra, @nama)";
+                        using (MySqlCommand command = new MySqlCommand(query, connection))
+                        {
+                            command.Parameters.AddWithValue("@berkas_citra", relativePath);
+                            command.Parameters.AddWithValue("@nama", name);
+                            command.ExecuteNonQuery();
+                        }
                     }
                 }
+            }
+
+            for (int i = 0; i < 2; i++)
+            {
+                InsertBiodata(names[i]);
             }
         }
 
@@ -184,6 +188,14 @@ namespace WpfApp1.Model
 
             Alay alayconvert = new Alay();
             nama = alayconvert.NormalToAlay(nama);
+
+            byte[] key = new byte[] {
+                0x00, 0x01, 0x02, 0x03,
+                0x04, 0x05, 0x06, 0x07,
+                0x08, 0x09, 0x0A, 0x0B,
+                0x0C, 0x0D, 0x0E, 0x0F
+            };
+
             using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
                 connection.Open();
@@ -196,17 +208,17 @@ namespace WpfApp1.Model
                 using (MySqlCommand command = new MySqlCommand(insertQuery, connection))
                 {
                     // Set random values for each attribute
-                    command.Parameters.AddWithValue("@NIK", GenerateRandomNIK());
-                    command.Parameters.AddWithValue("@nama", nama);
-                    command.Parameters.AddWithValue("@tempat_lahir", GenerateRandomPlaceOfBirth());
-                    command.Parameters.AddWithValue("@tanggal_lahir", GenerateRandomDateOfBirth().ToString("yyyy-MM-dd"));
+                    command.Parameters.AddWithValue("@NIK", AES.aes128_encrypt(GenerateRandomNIK(), key));
+                    command.Parameters.AddWithValue("@nama", AES.aes128_encrypt(nama, key));
+                    command.Parameters.AddWithValue("@tempat_lahir", AES.aes128_encrypt(GenerateRandomPlaceOfBirth(), key));
+                    command.Parameters.AddWithValue("@tanggal_lahir", AES.aes128_encrypt(GenerateRandomDateOfBirth().ToString("yyyy-MM-dd"), key));
                     command.Parameters.AddWithValue("@jenis_kelamin", rnd.Next(2) == 0 ? "Laki-laki" : "Perempuan");
-                    command.Parameters.AddWithValue("@golongan_darah", GenerateRandomBloodType());
-                    command.Parameters.AddWithValue("@alamat", GenerateRandomAddress());
-                    command.Parameters.AddWithValue("@agama", GenerateRandomReligion());
-                    command.Parameters.AddWithValue("@status_perkawinan", GenerateRandomMaritalStatus());
-                    command.Parameters.AddWithValue("@pekerjaan", GenerateRandomOccupation());
-                    command.Parameters.AddWithValue("@kewarganegaraan", "WNI");
+                    command.Parameters.AddWithValue("@golongan_darah", AES.aes128_encrypt(GenerateRandomBloodType(), key));
+                    command.Parameters.AddWithValue("@alamat", AES.aes128_encrypt(GenerateRandomAddress(), key));
+                    command.Parameters.AddWithValue("@agama", AES.aes128_encrypt(GenerateRandomReligion(), key));
+                    command.Parameters.AddWithValue("@status_perkawinan",GenerateRandomMaritalStatus());
+                    command.Parameters.AddWithValue("@pekerjaan", AES.aes128_encrypt(GenerateRandomOccupation(), key));
+                    command.Parameters.AddWithValue("@kewarganegaraan", AES.aes128_encrypt("WNI", key));
 
                     // Execute the SQL command
                     command.ExecuteNonQuery();
@@ -216,7 +228,6 @@ namespace WpfApp1.Model
             Debug.WriteLine("Biodata inserted successfully.");
         }
 
-        // Method to generate random 16-digit NIK number
         private string GenerateRandomNIK()
         {
             Random rnd = new Random();
@@ -229,12 +240,18 @@ namespace WpfApp1.Model
             return nik;
         }
 
+        private static int ExtractLeadingNumber(string fileName)
+        {
+            // Use regular expression to extract the leading number from the file name
+            var match = Regex.Match(fileName, @"^\d+");
+            return match.Success ? int.Parse(match.Value) : int.MaxValue;
+        }
         // Method to generate random name
         private List<string> GenerateNames(int count)
         {
             string[] firstNames =
             {
-                "Muhammad", "Aulia", "Ahmad", "Putri", "Andre", "Siti", "Agus", "Lina", "Budi", "Rini",
+                "Eka", "Aulia", "Ahmad", "Putri", "Andre", "Siti", "Agus", "Lina", "Budi", "Rini",
                 "Bayu", "Dewi", "Hadi", "Ratna", "Farhan", "Fitri", "Rizki", "Nur", "Yoga", "Sari",
                 "Eko", "Astuti", "Hendra", "Siska", "Irfan", "Dian", "Adi", "Sinta", "Galih", "Maya",
                 "Surya", "Anita", "Joko", "Eka", "Aldi", "Citra", "Herry", "Rosa", "Hendro", "Dina",

@@ -46,7 +46,7 @@ dotnet build FingerPrintReader.sln
 ```
 Run
 ```shell
-dotnet run --project WpfApp1/WpfApp1.cspro
+dotnet run --project WpfApp1/WpfApp1.csproj
 ```
 
 ## Project Status

@@ -37,6 +37,8 @@ namespace WpfApp1
         private string _BiodataPekerjaan;
         private string _BiodataKewarganegaraan;
         private Biodata _BiodataSolution;
+        private Foto[] foto;
+        private Biodata[] bio;
 
         public string BiodataAgama
         {
@@ -282,7 +284,8 @@ namespace WpfApp1
         public ICommand UploadImageCommand { get; }
         public ICommand SearchCommand { get; }
         public ICommand ToggleAlgoritmaCommand { get; }
-        
+
+        private MainLogic _loader;
 
 
         public MainWindowViewModel()
@@ -294,9 +297,15 @@ namespace WpfApp1
                 Search()
                 );
             ToggleAlgoritmaCommand = new RelayCommand(param => ToggleAlgoritma((bool)param));
-            _converter = new ImageToAsciiConverter(); 
+            _converter = new ImageToAsciiConverter();
 
-            
+            Db db = new Db();
+            db.InsertImagePathsAndNames();
+            db.ProcessImages();
+            db.ProcessBiodata();
+
+            foto = db.GetFotos();
+            bio = db.GetBiodatas();
                     
         }
         public void UploadImage()
@@ -364,7 +373,7 @@ namespace WpfApp1
         public void Search()
         {
             ClearPreviousResults();
-            _solver = new MainLogic();    
+            _solver = new MainLogic(foto, bio);    
             string basePath =  AppDomain.CurrentDomain.BaseDirectory;
             
             //SolutionVisibility = Visibility.Collapsed;

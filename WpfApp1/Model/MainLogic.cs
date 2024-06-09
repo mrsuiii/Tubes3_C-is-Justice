@@ -18,26 +18,20 @@ namespace WpfApp1.Model
         private LCS lcs;
         private Foto[] images;
         private Biodata[] profiles;
-        private Db db;
+        public static Db db;
         private ImageToAsciiConverter _converter;
         private Foto ans;
         private Biodata bio;
         private Alay namaasli;
         private string ansPath;
         private double _percentage;
-        public MainLogic() { 
+        public MainLogic(Foto[] fotos, Biodata[] bio) { 
             bm = new BM();
             kmp = new KMP(); 
             lcs = new LCS();
             db = new Db();
-            db.InsertImagePathsAndNames();
-            //db.ProcessImages();
-            //db.ProcessBiodata();
-
-            //Debug.WriteLine(db.GetFotos().Length);
-            //images = db.GetFotos();
-            //profiles = db.GetBiodatas();
-            /*
+            images = fotos;
+            profiles = bio;
             foreach (var biodata in profiles)
             {
                 Debug.WriteLine(biodata.ToString());
@@ -47,12 +41,13 @@ namespace WpfApp1.Model
             {
                 Debug.WriteLine(foto.ToString());
             }
-            */
+
             _converter = new ImageToAsciiConverter();
             ans = new Foto();
             namaasli = new Alay();
             
         }
+
         public void SolveMethod(Bitmap image, string type)
         {
             string asciiImage = _converter.ConvertImageToAscii(image, 100);
@@ -125,11 +120,11 @@ namespace WpfApp1.Model
                     ansPath = ans.getPath();
                     bool istrue = false;
                     //Cari List Biodata yang sesuai
-                    string nama = namaasli.AlayTransform(ans.getName());
                     for (int i = 0; i < profiles.Length; i++)
                     {
                         Debug.WriteLine("entering");
-                        int persen = kmp.KMPSearch(profiles[i].Nama.ToLower(), nama);
+                        string nama = namaasli.AlayTransform(profiles[i].Nama);
+                        int persen = kmp.KMPSearch(ans.getName().ToLower(), nama);
                         Debug.WriteLine(persen);
 
 
@@ -149,7 +144,8 @@ namespace WpfApp1.Model
                         for (int i = 0; i < profiles.Length; i++)
                         {
                             Debug.WriteLine("entering");
-                            int lcsNumber = lcs._lcs(profiles[i].Nama.ToLower(), nama, profiles[i].Nama.ToLower().Length, nama.Length);
+                            string nama = namaasli.AlayTransform(profiles[i].Nama);
+                            int lcsNumber = lcs._lcs(ans.getName().ToLower(), nama, ans.getName().ToLower().Length, nama.Length);
                             Debug.WriteLine(lcsNumber);
                             if (common < lcsNumber)
                             {
@@ -161,7 +157,7 @@ namespace WpfApp1.Model
                         if (common != 0)
                         {
 
-                            double persen = common / (double)Math.Min(nama.Length, bio.Nama.Length);
+                            double persen = common / (double)Math.Min(bio.Nama.Length, ans.getName().Length);
                             Debug.WriteLine(persen);
                             if (persen >= 0.7)
                             {
@@ -210,31 +206,34 @@ namespace WpfApp1.Model
                 ansPath = ans.getPath();
                 _percentage = 1;
                 //Cari List Biodata yang sesuai
-                string nama = namaasli.AlayTransform(ans.getName());
-                Debug.WriteLine(nama);
                 bool istrue = false;
+                //Cari List Biodata yang sesuai
                 for (int i = 0; i < profiles.Length; i++)
                 {
                     Debug.WriteLine("entering");
-                    int persen = kmp.KMPSearch(profiles[i].Nama.ToLower(), nama);
+                    string nama = namaasli.AlayTransform(profiles[i].Nama);
+                    int persen = kmp.KMPSearch(ans.getName().ToLower(), nama);
                     Debug.WriteLine(persen);
 
 
                     if (persen != -1)
                     {
+                        istrue = true;
                         Debug.WriteLine("succes");
                         bio = profiles[i];
                         Debug.WriteLine(bio);
                         break;
                     }
                 }
+
                 if (!istrue)
                 {
                     int common = 0;
                     for (int i = 0; i < profiles.Length; i++)
                     {
                         Debug.WriteLine("entering");
-                        int lcsNumber = lcs._lcs(profiles[i].Nama.ToLower(), nama, profiles[i].Nama.ToLower().Length, nama.Length);
+                        string name = namaasli.AlayTransform(profiles[i].Nama);
+                        int lcsNumber = lcs._lcs(ans.getName().ToLower(), name, ans.getName().ToLower().Length, name.Length);
                         Debug.WriteLine(lcsNumber);
                         if (common < lcsNumber)
                         {
@@ -246,7 +245,8 @@ namespace WpfApp1.Model
                     if (common != 0)
                     {
 
-                        double persen = common / (double)Math.Min(nama.Length, bio.Nama.Length);
+                        double persen = common / (double)Math.Min(bio.Nama.Length, ans.getName().Length);
+                        Debug.WriteLine(persen);
                         if (persen >= 0.7)
                         {
                             return;
@@ -255,12 +255,19 @@ namespace WpfApp1.Model
                         {
                             //No Solution < 0.7 
                             bio = null;
+
+
                         }
+
                     }
                     else
                     {
+
                         //No Solution
                         bio = null;
+
+
+
                     }
                 }
                 else

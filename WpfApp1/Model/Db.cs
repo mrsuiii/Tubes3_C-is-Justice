@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using System.Drawing;
 using System.Text;
-using  WpfApp1.Utilities;
+using WpfApp1.Utilities;
 using System.IO;
 using System.Diagnostics;
 
@@ -11,7 +11,7 @@ namespace WpfApp1.Model
 {
     public class Db
     {
-        private string connectionString = "server=localhost;user=root;password=emeryganteng;database=tubes3";
+        private string connectionString = "server=localhost;user=root;password=cu1747;database=fingerprint_db";
         private Foto[] fotos; // Array to store Foto objects
         private Biodata[] biodatas;
         private Alay alayconvert;
@@ -36,7 +36,7 @@ namespace WpfApp1.Model
                             string relativeImagePath = reader.GetString("berkas_citra");
                             string CorruptName = reader.GetString("nama");
                             relativeImagePath = relativeImagePath.Replace("/", "\\");
-                            string imagePath = Path.Combine(basePath,"..\\..\\..\\", relativeImagePath);
+                            string imagePath = Path.Combine(basePath, "..\\..\\..\\", relativeImagePath);
 
                             // Combine base path with the relative path to get the full path
                             // Validate the image path
@@ -69,8 +69,8 @@ namespace WpfApp1.Model
                     }
                 }
             }
-                        // Convert list to array
-                        fotos = fotoList.ToArray();
+            // Convert list to array
+            fotos = fotoList.ToArray();
         }
 
         public void ProcessBiodata()
@@ -140,7 +140,7 @@ namespace WpfApp1.Model
             // Generate 600 names
             List<string> names = GenerateNames(600);
 
-            List<(string asciichar, string Path, string Name)> filePathNamePairs = new List<(string asciichar, string Path, string Name)>();
+            List<(string Path, string Name)> filePathNamePairs = new List<(string Path, string Name)>();
 
             // Assign names based on index
             for (int i = 0; i < files.Length; i++)
@@ -151,12 +151,14 @@ namespace WpfApp1.Model
                     string fileName = Path.GetFileName(files[i]);
                     string relativePath = Path.Combine("fingerprint", fileName).Replace("\\", "/");
                     string name = names[nameIndex];
-                    string imagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\..\\", files[i]);
-                    Bitmap bitmap = LoadBitmap(imagePath);
-                    string asciiArt = ConvertImageToAscii(bitmap, 100); // Width set to 100 for example
                     //string asciiArt = "Asu";
-                    filePathNamePairs.Add((asciiArt, relativePath, name));
+                    filePathNamePairs.Add((relativePath, name));
                 }
+            }
+
+            for (int i = 0; i < 600; i++)
+            {
+                InsertBiodata(names[i]);
             }
 
             using (MySqlConnection connection = new MySqlConnection(connectionString))
@@ -165,36 +167,87 @@ namespace WpfApp1.Model
 
                 foreach (var pair in filePathNamePairs)
                 {
-                    string query = "INSERT INTO sidik_jari (berkas_citra, nama, path_citra) VALUES (@berkas_citra, @nama, @path_citra)";
+                    string query = "INSERT INTO sidik_jari (berkas_citra, nama) VALUES (@berkas_citra, @nama)";
                     using (MySqlCommand command = new MySqlCommand(query, connection))
                     {
-                        command.Parameters.AddWithValue("@berkas_citra", pair.asciichar);
+                        command.Parameters.AddWithValue("@berkas_citra", pair.Path);
                         command.Parameters.AddWithValue("@nama", pair.Name);
-                        command.Parameters.AddWithValue("@path_citra", pair.Path);
                         command.ExecuteNonQuery();
                     }
                 }
             }
         }
 
+        public void InsertBiodata(string nama)
+        {
+            Random rnd = new Random();
+
+            Alay alayconvert = new Alay();
+            nama = alayconvert.NormalToAlay(nama);
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            {
+                connection.Open();
+
+                // Prepare SQL statement for inserting biodata
+                string insertQuery = "INSERT INTO biodata (NIK, nama, tempat_lahir, tanggal_lahir, jenis_kelamin, golongan_darah, alamat, agama, status_perkawinan, pekerjaan, kewarganegaraan) " +
+                                     "VALUES (@NIK, @nama, @tempat_lahir, @tanggal_lahir, @jenis_kelamin, @golongan_darah, @alamat, @agama, @status_perkawinan, @pekerjaan, @kewarganegaraan)";
+
+                // Iterate through the biodata list
+                using (MySqlCommand command = new MySqlCommand(insertQuery, connection))
+                {
+                    // Set random values for each attribute
+                    command.Parameters.AddWithValue("@NIK", GenerateRandomNIK());
+                    command.Parameters.AddWithValue("@nama", nama);
+                    command.Parameters.AddWithValue("@tempat_lahir", GenerateRandomPlaceOfBirth());
+                    command.Parameters.AddWithValue("@tanggal_lahir", GenerateRandomDateOfBirth().ToString("yyyy-MM-dd"));
+                    command.Parameters.AddWithValue("@jenis_kelamin", rnd.Next(2) == 0 ? "Laki-laki" : "Perempuan");
+                    command.Parameters.AddWithValue("@golongan_darah", GenerateRandomBloodType());
+                    command.Parameters.AddWithValue("@alamat", GenerateRandomAddress());
+                    command.Parameters.AddWithValue("@agama", GenerateRandomReligion());
+                    command.Parameters.AddWithValue("@status_perkawinan", GenerateRandomMaritalStatus());
+                    command.Parameters.AddWithValue("@pekerjaan", GenerateRandomOccupation());
+                    command.Parameters.AddWithValue("@kewarganegaraan", "WNI");
+
+                    // Execute the SQL command
+                    command.ExecuteNonQuery();
+                }
+            }
+
+            Debug.WriteLine("Biodata inserted successfully.");
+        }
+
+        // Method to generate random 16-digit NIK number
+        private string GenerateRandomNIK()
+        {
+            Random rnd = new Random();
+            // Generate random 16-digit NIK number
+            string nik = "";
+            for (int i = 0; i < 16; i++)
+            {
+                nik += rnd.Next(10).ToString();
+            }
+            return nik;
+        }
+
+        // Method to generate random name
         private List<string> GenerateNames(int count)
         {
             string[] firstNames =
             {
-                "John", "Jane", "Michael", "Sarah", "David", "Emily", "Chris", "Emma", "Daniel", "Olivia",
-                "James", "Sophia", "Robert", "Isabella", "William", "Mia", "Joseph", "Amelia", "Charles", "Charlotte",
-                "Henry", "Grace", "Alexander", "Victoria", "Samuel", "Abigail", "Anthony", "Evelyn", "Thomas", "Ella",
-                "Andrew", "Harper", "Joshua", "Lily", "Matthew", "Aria", "Benjamin", "Zoey", "Ryan", "Penelope",
-                "Jacob", "Hannah", "Logan", "Avery", "Jack", "Riley", "Lucas", "Ellie", "Brian", "Nora"
+                "Muhammad", "Aulia", "Ahmad", "Putri", "Andre", "Siti", "Agus", "Lina", "Budi", "Rini",
+                "Bayu", "Dewi", "Hadi", "Ratna", "Farhan", "Fitri", "Rizki", "Nur", "Yoga", "Sari",
+                "Eko", "Astuti", "Hendra", "Siska", "Irfan", "Dian", "Adi", "Sinta", "Galih", "Maya",
+                "Surya", "Anita", "Joko", "Eka", "Aldi", "Citra", "Herry", "Rosa", "Hendro", "Dina",
+                "Dwi", "Rahayu", "Ivan", "Nita", "Aditya", "Rina", "Faisal", "Rini", "Denny", "Novi"
             };
 
             string[] lastNames =
             {
-                "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez",
-                "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson", "Thomas", "Taylor", "Moore", "Jackson", "Martin",
-                "Lee", "Perez", "Thompson", "White", "Harris", "Sanchez", "Clark", "Ramirez", "Lewis", "Robinson",
-                "Walker", "Young", "Allen", "King", "Wright", "Scott", "Torres", "Nguyen", "Hill", "Flores",
-                "Green", "Adams", "Nelson", "Baker", "Hall", "Rivera", "Campbell", "Mitchell", "Carter", "Roberts"
+                "Wibowo", "Sari", "Susanto", "Hadi", "Setiawan", "Kusuma", "Mulyadi", "Wijaya", "Budiman", "Purnama",
+                "Nugroho", "Santoso", "Pangestu", "Yulianto", "Pratama", "Yuniarti", "Hermawan", "Suryanto", "Widodo", "Puspitasari",
+                "Kurniawan", "Ningsih", "Saputra", "Rahayu", "Purnomo", "Sulistyo", "Putra", "Astuti", "Gunawan", "Agustina",
+                "Hartanto", "Utami", "Saputri", "Wijaya", "Indriani", "Hidayat", "Anggraini", "Prasetyo", "Sari", "Wijaya",
+                "Siregar", "Setiawan", "Wati", "Supriadi", "Nurhayati", "Saputra", "Handayani", "Saputra", "Lestari", "Santoso"
             };
 
             Random rand = new Random();
@@ -210,9 +263,92 @@ namespace WpfApp1.Model
             return names;
         }
 
-        public int FotosLength() { 
+        // Method to generate random place of birth
+        private string GenerateRandomPlaceOfBirth()
+        {
+            Random rnd = new Random();
+            string[] places = {
+                "Jakarta", "Bandung", "Surabaya", "Semarang", "Medan",
+                "Denpasar", "Makassar", "Palembang", "Yogyakarta", "Malang",
+                "Bogor", "Tangerang", "Depok", "Pekanbaru", "Padang",
+                "Bandar Lampung", "Surakarta", "Banjarmasin", "Serang", "Balikpapan",
+                "Pontianak", "Manado", "Jambi", "Mataram", "Banda Aceh",
+                "Pekalongan", "Bengkulu", "Ambon", "Samarinda", "Palu"
+            };
+            return places[rnd.Next(places.Length)];
+        }
+
+        // Method to generate random date of birth between 1950 and 2003
+        private DateTime GenerateRandomDateOfBirth()
+        {
+            Random rnd = new Random();
+            DateTime startDate = new DateTime(1950, 1, 1);
+            DateTime endDate = new DateTime(2003, 12, 31);
+            int range = (endDate - startDate).Days;
+            return startDate.AddDays(rnd.Next(range));
+        }
+
+        // Method to generate random blood type
+        private string GenerateRandomBloodType()
+        {
+            Random rnd = new Random();
+            string[] bloodTypes = { "A", "B", "AB", "O" };
+            return bloodTypes[rnd.Next(bloodTypes.Length)];
+        }
+
+        // Method to generate random address
+        private string GenerateRandomAddress()
+        {
+            Random rnd = new Random();
+            string[] streets = {
+                "Jl. Jendral Sudirman", "Jl. MH Thamrin", "Jl. Diponegoro",
+                "Jl. Pahlawan", "Jl. Gajah Mada", "Jl. Imam Bonjol",
+                "Jl. Veteran", "Jl. A. Yani", "Jl. Asia Afrika", "Jl. Raden Saleh",
+                "Jl. Raya", "Jl. KH. Hasyim Asy'ari", "Jl. Pemuda", "Jl. Gatot Subroto",
+                "Jl. Raya Bogor", "Jl. Cikutra", "Jl. Sukajadi", "Jl. Cimanuk",
+                "Jl. Ki Mangunsarkoro", "Jl. Adisucipto", "Jl. Sisingamangaraja",
+                "Jl. Soekarno-Hatta", "Jl. Pahlawan Revolusi", "Jl. Merdeka", "Jl. Sulawesi",
+                "Jl. Mataram", "Jl. Piere Tendean", "Jl. Thamrin", "Jl. D.I. Panjaitan",
+                "Jl. Dr. Wahidin", "Jl. Panglima Sudirman"
+            };
+            string[] cities = {
+                "Jakarta", "Bandung", "Surabaya", "Semarang", "Medan",
+                "Denpasar", "Makassar", "Palembang", "Yogyakarta", "Malang",
+                "Bogor", "Tangerang", "Depok", "Pekanbaru", "Padang",
+                "Bandar Lampung", "Surakarta", "Banjarmasin", "Serang", "Balikpapan",
+                "Pontianak", "Manado", "Jambi", "Mataram", "Banda Aceh",
+                "Pekalongan", "Bengkulu", "Ambon", "Samarinda", "Palu"
+            };
+            return $"{streets[rnd.Next(streets.Length)]}, {cities[rnd.Next(cities.Length)]}";
+        }
+
+        // Method to generate random religion
+        private string GenerateRandomReligion()
+        {
+            Random rnd = new Random();
+            string[] religions = { "Islam", "Kristen", "Katholik", "Hindu", "Buddha", "Konghucu" };
+            return religions[rnd.Next(religions.Length)];
+        }
+
+        // Method to generate random marital status
+        private string GenerateRandomMaritalStatus()
+        {
+            Random rnd = new Random();
+            string[] maritalStatuses = { "Belum Menikah", "Menikah", "Cerai" };
+            return maritalStatuses[rnd.Next(maritalStatuses.Length)];
+        }
+
+        // Method to generate random occupation
+        private string GenerateRandomOccupation()
+        {
+            Random rnd = new Random();
+            string[] occupations = { "Mahasiswa", "Wiraswasta", "Pegawai Swasta", "PNS", "Guru", "Dokter", "Pengusaha", "Pilot", "Peneliti", "Seniman" };
+            return occupations[rnd.Next(occupations.Length)];
+        }
+        public int FotosLength()
+        {
             return fotos.Length;
-            
+
         }
         public Foto[] GetFotos()
         {
@@ -278,8 +414,7 @@ namespace WpfApp1.Model
 
         private void PrintFotoValidation(Foto foto)
         {
-            
-        }
 
+        }
     }
 }

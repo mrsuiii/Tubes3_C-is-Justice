@@ -13,7 +13,7 @@ namespace WpfApp1.Model
 {
     public class Db
     {
-        private string connectionString = "server=localhost;user=root;password=emeryganteng;database=tubes3";
+        private string connectionString = "server=localhost;user=root;password=cu1747;database=fingerprint_db";
         private Foto[] fotos; // Array to store Foto objects
         private Biodata[] biodatas;
         private Alay alayconvert;

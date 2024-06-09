@@ -1,4 +1,4 @@
-#  Tucil3_13522009
+#  Tubes3_STIMA
 Pencocokan sidik jari adalah mencocokan sidik jari masukan pada sidik jari pada database
 ## Table of Contents
 * [General Info](#general-information)
@@ -12,6 +12,7 @@ Pencocokan sidik jari adalah mencocokan sidik jari masukan pada sidik jari pada 
 
 ## General Information
 Fingerprint matcher adalah aplikasi untuk mencocokan sidik jari di database, database terdiri dari tabel sidik_jari dan biodata, biodata dapat berisi nama alay, bahasa alay ini ditangani dengan regex. Untuk pencocokan sidik jari aplikasi ini menggunakan string matching booyer mooore dan knuth morris pratt
+
 <!-- You don't have to answer all the questions - just the ones relevant to your project. -->
 
 
@@ -34,15 +35,23 @@ git clone
 ```
 pindahkan direktori folder yang berisi kode program
 ```shell
-cd Tucil3_13522009
+cd Tubes3_Tubes3_C-is-Justice
 ```
-Compile Program(Optional)
+Compile Program
 ```shell
-javac -d bin src/*.java
+cd src
+```
+```shell
+dotnet build FingerPrintReader.sln
 ```
 Run
 ```shell
-java -cp bin Main
+dotnet run --project WpfApp1/WpfApp1.cspro
+```
+
+Database
+```shell
+dotnet run --project WpfApp1/WpfApp1.cspro
 ```
 
 ## Project Status
@@ -51,7 +60,7 @@ Project ini : Selesai.
 
 
 ## Contact
-Created by (cupski) Muhammad Yusuf Rafi/13522009.
+Created by (cupski) Muhammad Yusuf Rafi/13522009, (Devinzenzhang)  Devinzen/13522064, (mrsuiii) Emery Fathan Zwaegry/13522079.
 
 
 <!-- Optional -->

@@ -16,41 +16,23 @@ namespace WpfApp1.Model
         private BM bm;
         private KMP kmp;
         private LCS lcs;
-        private Foto[] images;
-        private Biodata[] profiles;
-        public static Db db;
         private ImageToAsciiConverter _converter;
         private Foto ans;
         private Biodata bio;
         private Alay namaasli;
         private string ansPath;
         private double _percentage;
-        public MainLogic(Foto[] fotos, Biodata[] bio) { 
+        public MainLogic() { 
             bm = new BM();
             kmp = new KMP(); 
             lcs = new LCS();
-            db = new Db();
-            images = fotos;
-            profiles = bio;
-            foreach (var biodata in profiles)
-            {
-                Debug.WriteLine(biodata.ToString());
-            }
-
-            foreach (var foto in images)
-            {
-                Debug.WriteLine(foto.ToString());
-            }
-
             _converter = new ImageToAsciiConverter();
             ans = new Foto();
             namaasli = new Alay();
-            
         }
-
-        public void SolveMethod(Bitmap image, string type)
+        public void SolveMethod(Bitmap image, string type,Foto[] images,Biodata[] profiles)
         {
-            string asciiImage = _converter.ConvertImageToAscii(image, 100);
+            string[] TImages = _converter.ConvertImageToAsciiArray(image);
 
             bool isMatch = false;
             if (type == "BM")
@@ -58,19 +40,24 @@ namespace WpfApp1.Model
                 for (int i = 0; i < images.Length; i++)
                 {
                     Debug.WriteLine("entering");
-                    int persen = bm.BoyerMooreSearch(images[i].getAscii(), asciiImage);
-                    Debug.WriteLine(persen);
+                    bool isFound = false;
 
-
-                    if (persen != -1)
+                    for (int j = 0; j < TImages.Length; j++)
                     {
-                        Debug.WriteLine("succes");
-                        ans = images[i];
-                        ansPath = images[i].getPath();
-                        isMatch = true;
-                        break;
+                        Debug.WriteLine(TImages[j]);
+                        int persen = bm.BoyerMooreSearch(images[i].getAscii(), TImages[j]);
+                        Debug.WriteLine(persen);
+                        if (persen != -1)
+                        {
+                            Debug.WriteLine("succes");
+                            ans = images[i];
+                            ansPath = images[i].getPath();
+                            isMatch = true;
+                            isFound = true;
+                            break;
+                        }
                     }
-
+                    if (isFound) { break; }
                 }
             }
             else
@@ -78,42 +65,56 @@ namespace WpfApp1.Model
                 for (int i = 0; i < images.Length; i++)
                 {
                     Debug.WriteLine("entering");
-                    int persen = kmp.KMPSearch(images[i].getAscii(), asciiImage);
-                    Debug.WriteLine(persen);
+                    bool isFound = false;
 
-
-                    if (persen != -1)
+                    for (int j = 0; j < TImages.Length; j++)
                     {
-                        Debug.WriteLine("succes");
-                        ans = images[i];
-                        ansPath = images[i].getPath();
-                        isMatch = true;
-                        break;
+                        Debug.WriteLine(TImages[j]);
+                        int persen = kmp.KMPSearch(images[i].getAscii(),TImages[j]);
+                        Debug.WriteLine(persen);
+                        if (persen != -1)
+                        {
+                            Debug.WriteLine("succes");
+                            ans = images[i];
+                            ansPath = images[i].getPath();
+                            isMatch = true;
+                            isFound = true;
+                            break;
+                        }
                     }
+                    if (isFound) { break; }
+
+
+
 
                 }
             }
 
-            //if pattern matched
+            //if pattern not matched
             if (!isMatch)
             {
                 Debug.WriteLine("there is no 100%");
                 int commonSubseq = 0;
+                int markIndex = 0;
                 for (int i = 0; i < images.Length; i++)
                 {
-                    int temp = lcs._lcs(asciiImage, images[i].getAscii(), asciiImage.Length, images[i].getAscii().Length);
-                    Debug.WriteLine(temp);
-                    if (commonSubseq < temp)
-                    {
-                        commonSubseq = temp;
-                        ans = images[i];
-                        Debug.WriteLine(commonSubseq / ans.getAscii().Length);
-                    }
 
+                    for (int j = 0; j < TImages.Length; j++)
+                    {
+                        int temp = lcs._lcs(TImages[j], images[i].getAscii(), TImages[j].Length, images[i].getAscii().Length);
+                        Debug.WriteLine($"LCS Timages[{j}]: ",temp.ToString());
+                        if (commonSubseq < temp)
+                        {
+                            markIndex = j;
+                            commonSubseq = temp;
+                            ans = images[i];
+                            Debug.WriteLine(commonSubseq / ans.getAscii().Length);
+                        }
+                    }
                 }
 
-                double percentage = commonSubseq / (double)ans.getAscii().Length;
-                Debug.WriteLine(percentage);
+                double percentage = commonSubseq / (double) TImages[markIndex].Length;
+                Debug.WriteLine($"Percentage Hasil LCS maksimal:",percentage.ToString());
                 _percentage = percentage;
                 if (percentage > 0.7)
                 {
@@ -159,13 +160,13 @@ namespace WpfApp1.Model
 
                             double persen = common / (double)Math.Min(bio.Nama.Length, ans.getName().Length);
                             Debug.WriteLine(persen);
-                            if (persen >= 0.7)
+                            if (persen >= 0.65)
                             {
                                 return;
                             }
                             else
                             {
-                                //No Solution < 0.7 
+                                //No Solution <0.65
                                 bio = null;
 
 
@@ -177,13 +178,7 @@ namespace WpfApp1.Model
 
                             //No Solution
                             bio = null;
-
-
-
                         }
-
-
-
                     }
                     else
                     {
@@ -247,7 +242,7 @@ namespace WpfApp1.Model
 
                         double persen = common / (double)Math.Min(bio.Nama.Length, ans.getName().Length);
                         Debug.WriteLine(persen);
-                        if (persen >= 0.7)
+                        if (persen >= 0.65)
                         {
                             return;
                         }
@@ -293,6 +288,10 @@ namespace WpfApp1.Model
         public Biodata getBio() {
 
             return bio;
+        }
+        public string nama()
+        {
+            return ans.getName();
         }
     }
 }

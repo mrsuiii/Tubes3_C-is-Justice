@@ -31,7 +31,7 @@ Program merupakan GUI yang menggunakan framework WPF.
 
 ## Usage
 ```shell
-git clone 
+git clone https://github.com/mrsuiii/Tubes3_C-is-Justice
 ```
 pindahkan direktori folder yang berisi kode program
 ```shell

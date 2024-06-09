@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Org.BouncyCastle.Utilities.Collections;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -23,7 +24,7 @@ namespace WpfApp1.Model
         private Biodata bio;
         private Alay namaasli;
         private string ansPath;
-        
+        private double _percentage;
         public MainLogic() { 
             bm = new BM();
             kmp = new KMP(); 
@@ -52,10 +53,10 @@ namespace WpfApp1.Model
             namaasli = new Alay();
             
         }
-        public void  SolveMethod(Bitmap image, string type) {
+        public void SolveMethod(Bitmap image, string type)
+        {
             string asciiImage = _converter.ConvertImageToAscii(image, 100);
-            
-        
+
             bool isMatch = false;
             if (type == "BM")
             {
@@ -97,114 +98,11 @@ namespace WpfApp1.Model
 
                 }
             }
-               
-            //if pattern matched
 
+            //if pattern matched
             if (!isMatch)
             {
-                Debug.WriteLine("ther is no 100%");
-                int commonSubseq = 0;
-                for (int i = 0; i < images.Length; i++) {
-                    int temp = lcs._lcs(asciiImage, images[i].getAscii(), asciiImage.Length, images[i].getAscii().Length);
-                    Debug.WriteLine(temp);
-                    if (commonSubseq < temp)
-                    {
-                        commonSubseq = temp;
-                        ans = images[i];
-                        Debug.WriteLine(commonSubseq / ans.getAscii().Length);
-                    }
-           
-                }
-                
-                double percentage  = commonSubseq/ (double)ans.getAscii().Length;
-                Debug.WriteLine(percentage);
-                if (percentage > 0.7)
-                {
-                    ansPath = ans.getPath();
-
-                    //Cari List Biodata yang sesuai
-                    string nama = namaasli.AlayTransform(ans.getName());
-                    for (int i = 0; i < profiles.Length; i++)
-                    {
-                        Debug.WriteLine("entering");
-                        int persen = kmp.KMPSearch(nama, "KMP");
-                        Debug.WriteLine(persen);
-
-
-                        if (persen != -1)
-                        {
-                            Debug.WriteLine("succes");
-                            bio = profiles[i];
-                            Debug.WriteLine(bio);
-                            break;
-                        }
-                    }
-
-                }
-                else {
-                    //there is no solution
-                    Debug.WriteLine("Not 100%");
-                }
-            }
-            else
-            {
-                //solution is
-                Debug.WriteLine("Solution 100% matched");
-                Debug.WriteLine(ans.getPath());
-                ansPath= ans.getPath();
-
-                //Cari List Biodata yang sesuai
-                string nama = namaasli.AlayTransform(ans.getName());
-                Debug.WriteLine(nama);
-                for(int i =0; i < profiles.Length; i++)
-                {
-                    Debug.WriteLine("entering");
-                    int persen = kmp.KMPSearch(profiles[i].Nama.ToLower(), nama);
-                    Debug.WriteLine(persen);
-
-
-                    if (persen != -1)
-                    {
-                        Debug.WriteLine("succes");
-                        bio = profiles[i];
-                        Debug.WriteLine(bio);
-                        break;
-                    }
-                }
-
-
-            }
-            
-        }
-
-        /*
-        public void SolveKMP(Bitmap image)
-        {
-            string asciiImage = _converter.ConvertImageToAscii(image, 100);
-
-
-            bool isMatch = false;
-            for (int i = 0; i < images.Length; i++)
-            {
-
-                Debug.WriteLine("entering");
-                int persen = kmp.KMPSearch(images[i].getAscii(), asciiImage);
-                Debug.WriteLine(persen);
-                if (persen != -1)
-                {
-                    Debug.WriteLine("succes");
-                    ans = images[i];
-                    ansPath = images[i].getPath();
-                    isMatch = true;
-                    break;
-                }
-
-            }
-            //if pattern matched
-
-            if (!isMatch)
-            {
-                Debug.WriteLine("ther is no 100%");
+                Debug.WriteLine("there is no 100%");
                 int commonSubseq = 0;
                 for (int i = 0; i < images.Length; i++)
                 {
@@ -221,15 +119,87 @@ namespace WpfApp1.Model
 
                 double percentage = commonSubseq / (double)ans.getAscii().Length;
                 Debug.WriteLine(percentage);
+                _percentage = percentage;
                 if (percentage > 0.7)
                 {
                     ansPath = ans.getPath();
+                    bool istrue = false;
+                    //Cari List Biodata yang sesuai
+                    string nama = namaasli.AlayTransform(ans.getName());
+                    for (int i = 0; i < profiles.Length; i++)
+                    {
+                        Debug.WriteLine("entering");
+                        int persen = kmp.KMPSearch(profiles[i].Nama.ToLower(), nama);
+                        Debug.WriteLine(persen);
 
+
+                        if (persen != -1)
+                        {
+                            istrue = true;
+                            Debug.WriteLine("succes");
+                            bio = profiles[i];
+                            Debug.WriteLine(bio);
+                            break;
+                        }
+                    }
+
+                    if (!istrue)
+                    {
+                        int common = 0;
+                        for (int i = 0; i < profiles.Length; i++)
+                        {
+                            Debug.WriteLine("entering");
+                            int lcsNumber = lcs._lcs(profiles[i].Nama.ToLower(), nama, profiles[i].Nama.ToLower().Length, nama.Length);
+                            Debug.WriteLine(lcsNumber);
+                            if (common < lcsNumber)
+                            {
+                                common = lcsNumber;
+                                bio = profiles[i];
+                            }
+                        }
+
+                        if (common != 0)
+                        {
+
+                            double persen = common / (double)Math.Min(nama.Length, bio.Nama.Length);
+                            Debug.WriteLine(persen);
+                            if (persen >= 0.7)
+                            {
+                                return;
+                            }
+                            else
+                            {
+                                //No Solution < 0.7 
+                                bio = null;
+
+
+                            }
+
+                        }
+                        else
+                        {
+
+                            //No Solution
+                            bio = null;
+
+
+
+                        }
+
+
+
+                    }
+                    else
+                    {
+                        //there is no solution
+                        bio = null;
+                        Debug.WriteLine("Not 100%");
+                    }
                 }
-                else
-                {
-                    //there is no solution
-                    Debug.WriteLine("Not 100%");
+                else {
+
+
+                    bio = null;
                 }
             }
             else
@@ -238,15 +208,84 @@ namespace WpfApp1.Model
                 Debug.WriteLine("Solution 100% matched");
                 Debug.WriteLine(ans.getPath());
                 ansPath = ans.getPath();
+                _percentage = 1;
+                //Cari List Biodata yang sesuai
+                string nama = namaasli.AlayTransform(ans.getName());
+                Debug.WriteLine(nama);
+                bool istrue = false;
+                for (int i = 0; i < profiles.Length; i++)
+                {
+                    Debug.WriteLine("entering");
+                    int persen = kmp.KMPSearch(profiles[i].Nama.ToLower(), nama);
+                    Debug.WriteLine(persen);
 
+
+                    if (persen != -1)
+                    {
+                        Debug.WriteLine("succes");
+                        bio = profiles[i];
+                        Debug.WriteLine(bio);
+                        break;
+                    }
+                }
+                if (!istrue)
+                {
+                    int common = 0;
+                    for (int i = 0; i < profiles.Length; i++)
+                    {
+                        Debug.WriteLine("entering");
+                        int lcsNumber = lcs._lcs(profiles[i].Nama.ToLower(), nama, profiles[i].Nama.ToLower().Length, nama.Length);
+                        Debug.WriteLine(lcsNumber);
+                        if (common < lcsNumber)
+                        {
+                            common = lcsNumber;
+                            bio = profiles[i];
+                        }
+                    }
+
+                    if (common != 0)
+                    {
+
+                        double persen = common / (double)Math.Min(nama.Length, bio.Nama.Length);
+                        if (persen >= 0.7)
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            //No Solution < 0.7 
+                            bio = null;
+                        }
+                    }
+                    else
+                    {
+                        //No Solution
+                        bio = null;
+                    }
+                }
+                else
+                {
+                    //there is no solution
+                    bio = null;
+                    Debug.WriteLine("Not 100%");
+                }
             }
-
         }
-        */
 
+        public double getPercentage()
+        {
+            
+            _percentage *= 100;
+            _percentage = Math.Round(_percentage, 2);
+            return _percentage;
+        }
         public string getPath(){
 
             return ansPath;
+        }
+        public Biodata getBio() {
+
+            return bio;
         }
     }
 }
